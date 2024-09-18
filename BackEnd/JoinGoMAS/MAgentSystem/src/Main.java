@@ -18,7 +18,7 @@ public class Main extends Agent {
             container.createNewAgent("JoinPass4", PassengerAgent.class.getName(), null).start();
             container.createNewAgent("JoinPass5", PassengerAgent.class.getName(), null).start();
             container.createNewAgent("Jade to SB Agent", JadetoSB.class.getName(), null).start();
-            container.createNewAgent("PortListenerAgent", "TCPListner", null).start();
+            container.createNewAgent("PortListenerAgent", "PassengerTCPListner", null).start();
 
         } catch (Exception e) {
             e.printStackTrace();

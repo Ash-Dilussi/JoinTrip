@@ -28,12 +28,15 @@ public class PassengerAgent extends Agent {
         }
 
         System.out.println(getAID().getLocalName() + ": A Join Passenger agent created.");
-        addBehaviour(new FindTaxiBehaviour());
+       // addBehaviour(new FindTaxiBehaviour());
+        addBehaviour(new callfromTCPListner());
 
     }
 
 
     class FindTaxiBehaviour extends OneShotBehaviour {
+
+
         public void action() {
             DFAgentDescription template = new DFAgentDescription();
             ServiceDescription sd = new ServiceDescription();
@@ -48,6 +51,7 @@ public class PassengerAgent extends Agent {
                         msg.addReceiver(dfAgent.getName());
                         msg.setContent("Need a ride!");
                         send(msg);
+
                     }
                 }
             } catch (FIPAException fe) {
@@ -57,6 +61,39 @@ public class PassengerAgent extends Agent {
 
         }
     }
+
+
+    class callfromTCPListner  extends CyclicBehaviour{
+
+        public void action(){
+
+            System.out.println(getAgent().getLocalName() + ": Waiting for new passenger data...");
+            // Receive messages from PassengerAgents and respond to ride requests
+            ACLMessage msg = receive();
+            if (msg != null) {
+                System.out.println(getAgent().getLocalName() + ": Ride requested by " + msg.getSender().getLocalName() + " " + msg.getContent());
+                // Respond to the ride request
+                ACLMessage response = msg.createReply();
+                response.setPerformative(ACLMessage.INFORM);
+                response.setContent("New Data Caught by:"+ getAgent().getLocalName());
+                send(response);
+                addBehaviour(new matchJoin());
+            } else {
+                block(); // Block until a message is received
+            }
+
+        }
+    }
+
+    class matchJoin extends  CyclicBehaviour{
+
+ private passengerDTO passengerData;
+        public void action(){
+
+
+        }
+    }
+
 }
 
 
