@@ -29,13 +29,14 @@ public class TCPListner extends Agent {
         } catch (FIPAException fe) {
             fe.printStackTrace();
         }
-        System.out.println("Agent " + getLocalName() + " started. Listening for registrations...");
+        System.out.println( getLocalName() + " started. Listening for registrations...");
         AtomicReference<String> message = new AtomicReference<>("");
         // new thread to listen for incoming calls
         new Thread(() -> {
             try (ServerSocket serverSocket = new ServerSocket(8082)) {
-                while (true) {
 
+
+                while (true) {
 
                     Socket socket = serverSocket.accept();
                     //serverSocket.setSoTimeout(30000);
@@ -50,8 +51,6 @@ public class TCPListner extends Agent {
                         System.out.println("Received registration: " + message);
 
                     }
-
-
                     // Close the socket
                     socket.close();
                 }
@@ -60,7 +59,7 @@ public class TCPListner extends Agent {
             }
         }).start();
 
-      //  addBehaviour(new TCPListner.WaitTCPListenBehaviour());
+
     }
 
 

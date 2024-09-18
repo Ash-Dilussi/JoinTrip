@@ -36,7 +36,7 @@ public class TaxiAgent extends Agent {
             // Receive messages from PassengerAgents and respond to ride requests
             ACLMessage msg = receive();
             if (msg != null) {
-                System.out.println(getAgent().getLocalName() + ": Ride requested by " + msg.getSender().getLocalName() + ": " + msg.getContent()+ ".... Responding...");
+                System.out.println(getAgent().getLocalName() + ": Ride requested by " + msg.getSender().getLocalName() + " " + msg.getContent()+ ".... Responding...");
                 // Respond to the ride request
                 ACLMessage response = msg.createReply();
                 response.setPerformative(ACLMessage.INFORM);
