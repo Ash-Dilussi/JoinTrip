@@ -5,6 +5,21 @@ target
 # sbteclipse plugin
 .target
 
+### Eclipse ###
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.settings
+.loadpath
+.recommenders
+
+
 # Tern plugin
 .tern-project
 
@@ -25,3 +40,8 @@ target
 .cache-main
 .scala_dependencies
 .worksheet
+
+### Eclipse Patch ###
+# Eclipse Core      
+.project
+.classpath
