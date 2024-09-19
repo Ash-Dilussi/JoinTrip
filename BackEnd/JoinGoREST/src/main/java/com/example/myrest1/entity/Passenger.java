@@ -4,11 +4,12 @@
  */
 package com.example.myrest1.entity;
 
+import org.springframework.stereotype.Component;
+
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Entity
 @Data
@@ -16,6 +17,12 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Component
 public class Passenger {
-    
-    
+
+	private String pasName;
+	private String padId;
+	private float startLon;
+	private float startLat;
+	private float destLon;
+	private float destLat;
+
 }

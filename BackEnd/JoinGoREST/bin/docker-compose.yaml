@@ -1,0 +1,36 @@
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: POSTGRES_PASSWORD
+    ports:
+      - "5432:5432"
+    networks:
+      - postgrescommunication
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpamge/pgadimn4
+    environment: 
+      PGADMIN_DEGAULT_EMAIL: 
+      PGADMIN_DEGAULT_PASSWORD:
+      PGADMIN_CONFIG_SERVRE_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - postgrescommunication
+
+networks:
+  postgrescommunication:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+
+
+
