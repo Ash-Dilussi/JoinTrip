@@ -8,7 +8,9 @@ import jade.lang.acl.ACLMessage;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,14 +42,16 @@ public class PassengerTCPListner extends Agent {
                     Socket socket = serverSocket.accept();
                     //serverSocket.setSoTimeout(30000);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    message.set(reader.readLine());
+                    
 
 
-                    if(message.get() != null && !message.get().isEmpty()) {
-                        String Message= String.valueOf(message);
-                        //TCPConfirmTask(Message);
-                        addBehaviour(new PassengerTCPListner.WaitTCPListenBehaviour(message));
-                        System.out.println("Received registration: " + message);
+                    synchronized (message)  { 
+                    	message.set(reader.readLine()); 
+                    	  if (message.get() != null && !message.get().isEmpty()) {
+                              // Add the behavior to handle the received message
+                              addBehaviour(new WaitTCPListenBehaviour(message));
+                          }
+                        System.out.println("Received registration to tcp: " + message);
 
                     }
                     // Close the socket
@@ -70,18 +74,20 @@ public class PassengerTCPListner extends Agent {
             this.message =message;
         }
 
+        @Override
         public void action(){
-            if(message !=null){
+            if(this.message != null && !this.message.get().isEmpty()){
 
                 Gson gson = new Gson();
-                passengerDTO passenderData = gson.fromJson(message.get(), passengerDTO.class);
+            
+
+                try {
+                    passengerDTO passenderData = gson.fromJson(this.message.get(), passengerDTO.class);
 
                 DFAgentDescription template = new DFAgentDescription();
                 ServiceDescription sd = new ServiceDescription();
                 sd.setType("passenger"); // Type of agents to look for
                 template.addServices(sd);
-
-                try {
                     // Search DF for all agents providing the "passenger" service
                     DFAgentDescription[] result = DFService.search(this.getAgent(), template);
                     System.out.println("Found " + result.length + " passenger agents.");
@@ -90,17 +96,22 @@ public class PassengerTCPListner extends Agent {
                     if (result.length > 0) {
                         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                         msg.addReceiver(result[0].getName()); // Send to first found agent (or choose a specific one)
-                        msg.setContent(message.get()); // Task to activate
+                        msg.setContentObject(passenderData); // Task to activate
                         send(msg);
 
                         System.out.println("Sent activation message to " + result[0].getName().getLocalName());
                     }
                 } catch (FIPAException e) {
                     e.printStackTrace();
-                }
+                } catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 
 
+            }else {
+             System.out.println("Message is null or empty");
             }
 
 
@@ -108,6 +119,9 @@ public class PassengerTCPListner extends Agent {
 
 
 
+    }
+
+ }
 
 
 
@@ -140,8 +154,5 @@ public class PassengerTCPListner extends Agent {
 //
 //        }
 
-    }
-
-}
-
+ 
 
