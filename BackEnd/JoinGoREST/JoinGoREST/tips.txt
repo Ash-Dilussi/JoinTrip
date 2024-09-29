@@ -1,0 +1,3 @@
+mvn spring-boot:run
+
+List<?> list;  // A list that can hold any type (wildcard)
