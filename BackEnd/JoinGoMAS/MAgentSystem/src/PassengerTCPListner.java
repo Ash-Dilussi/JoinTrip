@@ -1,127 +1,137 @@
-import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
-import jade.lang.acl.ACLMessage;
-import com.google.gson.Gson;
-
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.gson.Gson;
+
+import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.wrapper.AgentContainer;
+import jade.wrapper.AgentController;
+import jade.wrapper.StaleProxyException;
+
 public class PassengerTCPListner extends Agent {
 
-    @Override
-    protected void setup() {
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("PassengerTCPListner");
-        sd.setName(getLocalName());
-        DFAgentDescription dfd = new DFAgentDescription();
-        dfd.setName(getAID());
-        dfd.addServices(sd);
-        try {
-            DFService.register(this, dfd);
-        } catch (FIPAException fe) {
-            fe.printStackTrace();
-        }
-        System.out.println( getLocalName() + " started. Listening for registrations...");
-        AtomicReference<String> message = new AtomicReference<>("");
-        // new thread to listen for incoming calls
-        new Thread(() -> {
-            try (ServerSocket serverSocket = new ServerSocket(8082)) {
+	@Override
+	protected void setup() {
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("PassengerTCPListner");
+		sd.setName(getLocalName());
+		DFAgentDescription dfd = new DFAgentDescription();
+		dfd.setName(getAID());
+		dfd.addServices(sd);
+		try {
+			DFService.register(this, dfd);
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+		System.out.println( getLocalName() + " started. Listening for registrations...");
+		AtomicReference<String> message = new AtomicReference<>("");
+		// new thread to listen for incoming calls
+		new Thread(() -> {
+			try (ServerSocket serverSocket = new ServerSocket(8082)) {
 
 
-                while (true) {
+				while (true) {
 
-                    Socket socket = serverSocket.accept();
-                    //serverSocket.setSoTimeout(30000);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    
-
-
-                    synchronized (message)  { 
-                    	message.set(reader.readLine()); 
-                    	  if (message.get() != null && !message.get().isEmpty()) {
-                              // Add the behavior to handle the received message
-                              addBehaviour(new WaitTCPListenBehaviour(message));
-                          }
-                        System.out.println("Received registration to tcp: " + message);
-
-                    }
-                    // Close the socket
-                    socket.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+					Socket socket = serverSocket.accept();
+					//serverSocket.setSoTimeout(30000);
+					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
 
-    }
 
+					synchronized (message)  { 
+						message.set(reader.readLine()); 
+						if (message.get() != null && !message.get().isEmpty()) {
+							// Add the behavior to handle the received message
+							addBehaviour(new WaitTCPListenBehaviour(message));
+						}
+						System.out.println("Received registration to tcp: " + message);
 
-    class WaitTCPListenBehaviour extends OneShotBehaviour {
-
-        private AtomicReference<String> message;
-
-        public WaitTCPListenBehaviour(AtomicReference<String> message){
-            this.message =message;
-        }
-
-        @Override
-        public void action(){
-            if(this.message != null && !this.message.get().isEmpty()){
-
-                Gson gson = new Gson();
-            
-
-                try {
-                    passengerDTO passenderData = gson.fromJson(this.message.get(), passengerDTO.class);
-
-                DFAgentDescription template = new DFAgentDescription();
-                ServiceDescription sd = new ServiceDescription();
-                sd.setType("passenger"); // Type of agents to look for
-                template.addServices(sd);
-                    // Search DF for all agents providing the "passenger" service
-                    DFAgentDescription[] result = DFService.search(this.getAgent(), template);
-                    System.out.println("Found " + result.length + " passenger agents.");
-
-                    // Send a message to a specific passenger agent
-                    if (result.length > 0) {
-                        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                        msg.addReceiver(result[0].getName()); // Send to first found agent (or choose a specific one)
-                        msg.setContentObject(passenderData); // Task to activate
-                        send(msg);
-
-                        System.out.println("Sent activation message to " + result[0].getName().getLocalName());
-                    }
-                } catch (FIPAException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					}
+					// Close the socket
+					socket.close();
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}).start();
+
+
+	}
+
+
+	class WaitTCPListenBehaviour extends OneShotBehaviour {
+
+		private AtomicReference<String> message;
+
+		public WaitTCPListenBehaviour(AtomicReference<String> message){
+			this.message =message;
+		}
+
+		@Override
+		public void action(){
+			if(this.message != null && !this.message.get().isEmpty()){
+
+				Gson gson = new Gson();
+
+
+				passengerDTO passengerData = gson.fromJson(this.message.get(), passengerDTO.class);
+
+				//					DFAgentDescription template = new DFAgentDescription();
+				//					ServiceDescription sd = new ServiceDescription();
+				//					sd.setType("passenger"); // Type of agents to look for
+				//					template.addServices(sd);
+				//					// Search DF for all agents providing the "passenger" service
+				//					DFAgentDescription[] result = DFService.search(this.getAgent(), template);
+				//					System.out.println("Found " + result.length + " passenger agents.");
+
+				// Send a message to a specific passenger agent
+				//					if (result.length > 0) {
+				//						ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+				//						msg.addReceiver(result[0].getName()); // Send to first found agent (or choose a specific one)
+				//						msg.setContentObject(passengerData); // Task to activate
+				//						send(msg);
+				createPassengerAgent(passengerData);
+				//						System.out.println("Sent activation message to " + result[0].getName().getLocalName());
+				//					}
 
 
 
-            }else {
-             System.out.println("Message is null or empty");
-            }
+			}else {
+				System.out.println("Message is null or empty");
+			}
 
 
-        }
+		}
+
+		private void createPassengerAgent(passengerDTO passenger) {
+			try {
+				// Get the current container
+				AgentContainer container = getContainerController();
+
+				//Object[] args = new Object[] { passengerName };
+				Object[] args = new Object[] { passenger };
+				// Create the agent
+				AgentController passengerAgent = container.createNewAgent(passenger.getPasId(), PassengerAgent.class.getName(), args);
+				passengerAgent.start();
+				System.out.println("Created agent: " +passenger.getPasId());
+			} catch (StaleProxyException e) {
+				e.printStackTrace();
+			}
+		}
 
 
 
-    }
+	}
 
- }
+}
 
 
 
@@ -154,5 +164,5 @@ public class PassengerTCPListner extends Agent {
 //
 //        }
 
- 
+
 
