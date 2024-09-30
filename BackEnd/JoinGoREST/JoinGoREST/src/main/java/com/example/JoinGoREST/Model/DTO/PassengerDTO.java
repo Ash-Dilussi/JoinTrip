@@ -1,7 +1,5 @@
 package com.example.JoinGoREST.Model.DTO;
 
-import com.example.JoinGoREST.Model.Entity.Passenger;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class PassengerDTO {
-	
+
 	private String pasName;
 	private String padId;
+	private String desplace_id;
 	private float startLon;
 	private float startLat;
 	private float destLon;

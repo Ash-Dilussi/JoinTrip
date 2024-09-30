@@ -19,13 +19,14 @@ public class Passenger {
 	private String pasName;
 	@Id
 	private String pasId;
+	private String desplace_id;
 	private float startLon =0;
 	private float startLat =0;
 	private float destLon =0;
 	private float destLat =0;
 
-	
-	
-	
-	
+
+
+
+
 }

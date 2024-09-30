@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,21 +19,21 @@ import com.example.JoinGoREST.service.Ipassenger;
 @RequestMapping(value= "api/v1/passenger")
 @CrossOrigin
 public class PassengerController {
-	
+
 	@Autowired
 	private Ipassenger _passenger;
-	
-	
+
+
 	@GetMapping("/getallpassengers")
-		public List<Passenger> getAll(){
+	public List<Passenger> getAll(){
 		try {
 			return _passenger.getAllPassengers();
-			
+
 		}catch(Exception ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot retrieve  passengers"+ ex);
-			
+
 		}
-		
+
 	}
 
 	@PostMapping("/createpassenger")
@@ -46,7 +45,15 @@ public class PassengerController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot create passenger"+ ex);
 		}
 	}
-	
-	
-	
+
+	@PostMapping("/fromMAS")
+	public void frommas() {
+		try {
+			System.out.print("hit from mas"); 
+
+		}catch(Exception ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot create passenger"+ ex);
+		}
+	}
+
 }
