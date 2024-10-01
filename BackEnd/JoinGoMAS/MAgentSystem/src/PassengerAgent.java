@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -11,25 +13,21 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 // Define a PassengerAgent class representing a passenger seeking a taxi ride
 public class PassengerAgent extends Agent {
 
 	private long startTime;
-	private static final long TIME_LIMIT = 7000;
+	private static final long TIME_LIMIT = 90000;
 	private static int 	closeradius= 1;
 	private  passengerDTO passengerData = new passengerDTO();
 	private passengerDTO comparePassenger = new passengerDTO();
-	private List<passengerDTO> nearbyPassengerList = new ArrayList<>();
+	private List<String> destPlaceIdCheckednequlList = new ArrayList<>();
+	private List<passengerDTO> joinCompaitbleList = new ArrayList<>();
 
-	//	public passengerDTO getPassengerData() {
-	//		return passengerData;
-	//	}
-	//
-	//	public void setPassengerData(passengerDTO passengerData) {
-	//		this.passengerData = passengerData;
-	//	}
+
 
 	@Override
 	protected void setup() {
@@ -52,12 +50,11 @@ public class PassengerAgent extends Agent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			// Assuming the first argument is the PassengerDTO object
-			passengerData = (passengerDTO) args[0];
-			System.out.println("Passenger Agent created for: " + passengerData.getPasId());
+			passengerData = (passengerDTO) args[0]; 
 		} else {
 			System.out.println("No data received.");
 		}
-
+		destPlaceIdCheckednequlList.add(getLocalName());
 		System.out.println(getAID().getLocalName() + ": A Join Passenger agent created.");
 		// addBehaviour(new FindTaxiBehaviour());
 		//addBehaviour(new callfromTCPListner());
@@ -142,31 +139,64 @@ public class PassengerAgent extends Agent {
 		public void action(){
 
 			long elapsedTime = System.currentTimeMillis() - startTime;
-			if (elapsedTime < TIME_LIMIT) {
-				//passengerDTO passenger= getPassengerData();
+			if (elapsedTime < TIME_LIMIT) { 
 
-				System.out.println("broadcasting:");
-				System.out.println("placeID: " + passengerData.getDesplace_id());
-				System.out.println("Name: " + passengerData.getPasId());
+				DFAgentDescription template = new DFAgentDescription();
+				ServiceDescription sd = new ServiceDescription();
+				sd.setType("passenger");
+				template.addServices(sd);
+				try { 
+					String mypalceId = passengerData.getDesplace_id();
+					DFAgentDescription[] result = DFService.search(this.getAgent(), template);
+					if (result.length > 0) {
+						for (DFAgentDescription dfAgent : result) {
+							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+							msg.setConversationId("placeId");
+							msg.addReceiver(dfAgent.getName());
+							msg.setContent( mypalceId);
+							send(msg);
 
-				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-				msg.setContent(passengerData.getDesplace_id()); 
-				msg.addReceiver(new AID(PassengerAgent.class.getName(), AID.ISLOCALNAME)); // Change to your target agent's name
-				send(msg);
+							block(1000); // Block for 1 seconds to wait for responses
+						}
+					}
+				} catch (FIPAException fe) {
+					fe.printStackTrace(); 
 
-			}
 
-			else {
-				//remove behavior
-				System.out.println(getLocalName() + " :Done Broadcast. terminating agent");
-				for (passengerDTO passenger : nearbyPassengerList) {
+				}
+			}else {
+
+
+				final Gson gson = new Gson();
+				try { 
+					ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
+
+					returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
+					listToSB.setCurrentPassenger(passengerData);
+					listToSB.setJoinPassengerList(joinCompaitbleList);
+					msg.setConversationId("passtoSBJoin");  
+					String jsonString = gson.toJson(listToSB);
+					msg.setContent(jsonString);
+					msg.setContentObject(listToSB); 
+					msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
+					send(msg);
+
+				} catch (java.io.IOException e) {
+					e.printStackTrace();
+				}
+				System.out.println(getLocalName() + " :Done Broadcasting. Terminating agent");
+				for (passengerDTO passenger : joinCompaitbleList) {
 					System.out.println(passenger.getPasName() +" : " + passenger.getDesplace_id());
 				}
+				doDelete(); 
 
-				doDelete();   
 			}
 
+
 		}
+
+
+
 	}
 
 	class sendorinfotoMatch extends CyclicBehaviour{
@@ -174,69 +204,90 @@ public class PassengerAgent extends Agent {
 
 		@Override
 		public void action(){ 
-			ACLMessage msg = receive();
-			if(msg != null) { 
-				try{	
-					String content =msg.getContent();
-					String mydes= passengerData.getDesplace_id();
-					switch(content) {
-					case "infrotoMatch":
-
-						comparePassenger = (passengerDTO) msg.getContentObject();
-						System.out.println("comapre passenger data:"+ passengerData.getPasName()); 
-						System.out.println("Compare ID: " + passengerData.getPasId());
 
 
-						double distance = haversine(comparePassenger.getStartLat(), comparePassenger.getStartLon(), passengerData.getStartLat(), passengerData.getStartLon());
+			MessageTemplate placeIdBroadcastTemplate = MessageTemplate.MatchConversationId("placeId");
+			ACLMessage placebroadtMsg = receive(placeIdBroadcastTemplate);
 
-						if (distance <= closeradius) {
-							nearbyPassengerList.add(comparePassenger);
-						}
+			MessageTemplate joinpassinfoTemplate = MessageTemplate.MatchConversationId("joinpassenger");
+			ACLMessage joinpassdataMsg = receive(joinpassinfoTemplate);
 
-						break;
 
-					default:
 
-						if(content == mydes) {
+			if (placebroadtMsg != null) { 
+				if( placebroadtMsg.getContent().equals(passengerData.getDesplace_id()) && !isindestPlaceIdCheckednequlList(placebroadtMsg.getSender().getLocalName())) {
 
-							ACLMessage response = msg.createReply();
-							response.setPerformative(ACLMessage.INFORM);
-							response.setContent("infrotoMatch");
-							response.setContentObject(passengerData);
-							send(response);
+					//System.out.println("Received request to ride from: " + placebroadtMsg.getSender().getLocalName());
 
-						}
-						break;
+
+					try {
+						ACLMessage response = placebroadtMsg.createReply();
+						response.setConversationId("joinpassenger");
+						response.setPerformative(ACLMessage.INFORM);
+						response.setContent("infrotoMatch"); 
+						response.setContentObject(passengerData); 
+						send(response);
+						destPlaceIdCheckednequlList.add(placebroadtMsg.getSender().getLocalName());
+					}catch (IOException e) {
+
+						e.printStackTrace();
 					} 
 
-					msg.setContentObject(passengerData);}
-				catch( IOException  | UnreadableException e)   {
-					// TODO Auto-generated catch block
+				}
+
+
+			}
+
+			if(joinpassdataMsg != null){
+
+
+				try {
+					comparePassenger = (passengerDTO) joinpassdataMsg.getContentObject();
+					//System.out.println("Compare ID: " + comparePassenger.getPasId());
+					double distance = haversine(comparePassenger.getStartLat(), comparePassenger.getStartLon(), passengerData.getStartLat(), passengerData.getStartLon());
+					if (distance <= closeradius) {
+						System.out.println(getLocalName()+" : Join match: " + placebroadtMsg.getSender().getLocalName());
+
+						joinCompaitbleList.add(comparePassenger);
+					}
+
+				} catch (UnreadableException e) { 
 					e.printStackTrace();
 				}
-			}else {block();}
+
+			}
+
+			else {
+				block();}
+
 
 		}
+
+
+
+
+		private  boolean isindestPlaceIdCheckednequlList(String joinpassname) {
+			return destPlaceIdCheckednequlList.contains(joinpassname);
+
+		}
+
+
+		private static final double EARTH_RADIUS = 6371.0; // Earth radius in kilometers
+
+		public static double haversine(double lat1, double lon1, double lat2, double lon2) {
+			double dLat = Math.toRadians(lat2 - lat1);
+			double dLon = Math.toRadians(lon2 - lon1);
+
+			double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+					Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+					Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+			double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+			return EARTH_RADIUS * c; // Distance in kilometers
+		}
+
 	}
-
-
-
-
-	private static final double EARTH_RADIUS = 6371.0; // Earth radius in kilometers
-
-	public static double haversine(double lat1, double lon1, double lat2, double lon2) {
-		double dLat = Math.toRadians(lat2 - lat1);
-		double dLon = Math.toRadians(lon2 - lon1);
-
-		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-				Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-				Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-		return EARTH_RADIUS * c; // Distance in kilometers
-	}
-
 }
 
 

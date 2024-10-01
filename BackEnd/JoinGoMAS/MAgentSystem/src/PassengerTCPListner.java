@@ -116,7 +116,6 @@ public class PassengerTCPListner extends Agent {
 				// Get the current container
 				AgentContainer container = getContainerController();
 
-				//Object[] args = new Object[] { passengerName };
 				Object[] args = new Object[] { passenger };
 				// Create the agent
 				AgentController passengerAgent = container.createNewAgent(passenger.getPasId(), PassengerAgent.class.getName(), args);

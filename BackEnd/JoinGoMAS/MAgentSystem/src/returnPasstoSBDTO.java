@@ -3,20 +3,13 @@ import java.util.List;
 
 import jade.util.leap.Serializable;
 
-public class returnpasDTO implements Serializable {
+public class returnPasstoSBDTO implements Serializable {
 
 
-	private String pasId;
+	private passengerDTO currentPassenger;
 
 	private List<passengerDTO> joinPassengerList = new ArrayList<>();
 
-	public String getPasId() {
-		return pasId;
-	}
-
-	public void setPasId(String pasId) {
-		this.pasId = pasId;
-	}
 
 	public List<passengerDTO> getJoinPassengerList() {
 		return joinPassengerList;
@@ -24,5 +17,13 @@ public class returnpasDTO implements Serializable {
 
 	public void setJoinPassengerList(List<passengerDTO> joinPassengerList) {
 		this.joinPassengerList = joinPassengerList;
+	}
+
+	public passengerDTO getCurrentPassenger() {
+		return currentPassenger;
+	}
+
+	public void setCurrentPassenger(passengerDTO currentPassenger) {
+		this.currentPassenger = currentPassenger;
 	}
 }
