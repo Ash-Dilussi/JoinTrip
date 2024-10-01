@@ -1,7 +1,10 @@
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+
+import com.google.gson.Gson;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -10,6 +13,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 public class JadetoSB extends Agent {
 
@@ -30,33 +34,43 @@ public class JadetoSB extends Agent {
 		addBehaviour(new JadetoSB.WaitformsgBehaviour());
 	}
 
+
 	class WaitformsgBehaviour extends CyclicBehaviour {
+		private final Gson gson = new Gson();
+
 		@Override
 		public void action() {
-			System.out.println(getAgent().getLocalName() + ": Waiting for msg to send...");
-			// Receive messages from PassengerAgents and respond to ride requests
-			ACLMessage msg = receive();
-			if (msg != null) {
-				System.out.println(getAgent().getLocalName() + ": msg received from " + msg.getSender().getLocalName() + ": " + msg.getContent()+ "....Sending...");
 
-				String msgtosb= String.valueOf(getAgent().getLocalName() + ": msg received from " + msg.getSender().getLocalName() + ": " + msg.getContent()+ "....Sending...");
+			MessageTemplate passtoSBJoinTemplate = MessageTemplate.MatchConversationId("passtoSBJoin");
+			ACLMessage passtoSBJoinmsg = receive(passtoSBJoinTemplate);
+
+			System.out.println(getAgent().getLocalName() + ": Waiting for msg to send..."); 
+
+
+			if (passtoSBJoinmsg != null) {
+				System.out.println(getAgent().getLocalName() + ": msg received from " + passtoSBJoinmsg.getSender().getLocalName() + ": " + passtoSBJoinmsg.getContent()+ "....Sending...");
+
 				try {
-					sendMessageToSpringBoot(msgtosb);
+					returnPasstoSBDTO messageOBjectContent = (returnPasstoSBDTO) passtoSBJoinmsg.getContentObject();
+					sendJoinlistToSpringBoot(messageOBjectContent);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
-				ACLMessage response = msg.createReply();
-				response.setPerformative(ACLMessage.INFORM);
-				response.setContent("Msg Sent");
-				send(response);
+				//ACLMessage response = msg.createReply();
+				//response.setPerformative(ACLMessage.INFORM);
+				//response.setContent("Msg Sent");
+				//send(response);
 			} else {
-				block();
+				block();	
 			}
 		}
-		private void sendMessageToSpringBoot(String messageContent) throws Exception {
 
-			URL url = new URL("http://localhost:8080/api/v1/passenger/fromMAS");
+		private void sendJoinlistToSpringBoot(returnPasstoSBDTO messageContent) throws Exception {
 
+			URI uri = new URI("http://localhost:8080/api/v1/passenger/fromMAS");
+
+			// Convert URI to URL
+			URL url = uri.toURL();
 
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("POST");
@@ -64,7 +78,7 @@ public class JadetoSB extends Agent {
 			connection.setRequestProperty("Content-Type", "application/json");
 
 
-			String jsonInputString = "{\"content\": \"" + messageContent + "\"}";
+			String jsonInputString = gson.toJson(messageContent);
 
 
 			try (OutputStream os = connection.getOutputStream()) {

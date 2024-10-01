@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.JoinGoREST.Model.DTO.ReturnPasstoSBDTO;
 import com.example.JoinGoREST.Model.Entity.Passenger;
 import com.example.JoinGoREST.service.Ipassenger;
 
@@ -47,9 +48,11 @@ public class PassengerController {
 	}
 
 	@PostMapping("/fromMAS")
-	public void frommas() {
+	public void fromMas(@RequestBody ReturnPasstoSBDTO joinPassengerListData) {
 		try {
 			System.out.print("hit from mas"); 
+			System.out.println (joinPassengerListData);
+			System.out.println (joinPassengerListData.getJoinPassengerList());
 
 		}catch(Exception ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot create passenger"+ ex);

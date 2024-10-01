@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class PassengerDTO {
 
 	private String pasName;
-	private String padId;
+	private String pasId;
 	private String desplace_id;
 	private float startLon;
 	private float startLat;

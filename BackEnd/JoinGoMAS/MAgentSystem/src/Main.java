@@ -7,16 +7,8 @@ public class Main extends Agent {
 		jade.wrapper.AgentContainer container = rt.createMainContainer(new jade.core.ProfileImpl());
 		try {
 
-			Object[] args3 =new Object[]{"arg1", "ar"};
-			//  container.createNewAgent("Anura", helloworld.class.getName(), args3 ).start();
 
-			//container.createNewAgent("Arun(Taxi)", TaxiAgent.class.getName(), null).start();
-			//            container.createNewAgent("JoinPass1", PassengerAgent.class.getName(), null).start();
-			//            container.createNewAgent("JoinPass2", PassengerAgent.class.getName(), null).start();
-			//            container.createNewAgent("JoinPass3", PassengerAgent.class.getName(), null).start();
-			//            container.createNewAgent("JoinPass4", PassengerAgent.class.getName(), null).start();
-			//container.createNewAgent("JoinPass5", PassengerAgent.class.getName(), null).start();
-			container.createNewAgent("Jade to SB Agent", JadetoSB.class.getName(), null).start();
+			container.createNewAgent("Jade2SBAgent", JadetoSB.class.getName(), null).start();
 			container.createNewAgent("PortListenerAgent", "PassengerTCPListner", null).start();
 
 		} catch (Exception e) {
