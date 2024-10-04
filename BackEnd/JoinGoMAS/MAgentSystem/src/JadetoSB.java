@@ -48,7 +48,6 @@ public class JadetoSB extends Agent {
 
 
 			if (passtoSBJoinmsg != null) {
-				System.out.println(getAgent().getLocalName() + ": msg received from " + passtoSBJoinmsg.getSender().getLocalName() + ": " + passtoSBJoinmsg.getContent()+ "....Sending...");
 
 				try {
 					returnPasstoSBDTO messageOBjectContent = (returnPasstoSBDTO) passtoSBJoinmsg.getContentObject();
@@ -67,7 +66,7 @@ public class JadetoSB extends Agent {
 
 		private void sendJoinlistToSpringBoot(returnPasstoSBDTO messageContent) throws Exception {
 
-			URI uri = new URI("http://localhost:8080/api/v1/passenger/fromMAS");
+			URI uri = new URI("http://localhost:8080/api/v1/passenger/reponseJoin");
 
 			// Convert URI to URL
 			URL url = uri.toURL();

@@ -2,8 +2,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -20,12 +18,12 @@ import jade.lang.acl.UnreadableException;
 public class PassengerAgent extends Agent {
 
 	private long startTime;
-	private static final long TIME_LIMIT = 90000;
-	private static int 	closeradius= 1;
-	private  passengerDTO passengerData = new passengerDTO();
-	private passengerDTO comparePassenger = new passengerDTO();
+	private static final long TIME_LIMIT = 80000;
+	private static int 	closeradius= 2;
+	private  JoinRequestDTO passengerData = new JoinRequestDTO();
+	private JoinRequestDTO comparePassenger = new JoinRequestDTO();
 	private List<String> destPlaceIdCheckednequlList = new ArrayList<>();
-	private List<passengerDTO> joinCompaitbleList = new ArrayList<>();
+	private List<JoinRequestDTO> joinCompaitbleList = new ArrayList<>();
 
 
 
@@ -50,7 +48,7 @@ public class PassengerAgent extends Agent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			// Assuming the first argument is the PassengerDTO object
-			passengerData = (passengerDTO) args[0]; 
+			passengerData = (JoinRequestDTO) args[0]; 
 		} else {
 			System.out.println("No data received.");
 		}
@@ -107,15 +105,15 @@ public class PassengerAgent extends Agent {
 				System.out.println(getAgent().getLocalName() + ": Waiting for new passenger data kk...");
 				try{
 					//passengerDTO receivedData = (passengerDTO) msg.getContentObject();
-					passengerData = (passengerDTO) msg.getContentObject();
+					passengerData = (JoinRequestDTO) msg.getContentObject();
 					//setPassengerData(receivedData);
 
 					System.out.println("Received passenger data:");
-					System.out.println("ID: " + passengerData.getPasName());
-					System.out.println("Name: " + passengerData.getPasName());
+					//System.out.println("ID: " + passengerData.getPasName());
+					//	System.out.println("Name: " + passengerData.getPasName());
 
 
-					System.out.println(getAgent().getLocalName() + ": Ride requested by " + msg.getSender().getLocalName() + " " + passengerData.getPasName());
+					System.out.println(getAgent().getLocalName() + ": Ride requested by " + msg.getSender().getLocalName() + " "  );
 
 
 
@@ -156,7 +154,7 @@ public class PassengerAgent extends Agent {
 							msg.setContent( mypalceId);
 							send(msg);
 
-							block(1000); // Block for 1 seconds to wait for responses
+							//block(1000); // Block for 1 seconds to wait for responses
 						}
 					}
 				} catch (FIPAException fe) {
@@ -166,28 +164,31 @@ public class PassengerAgent extends Agent {
 				}
 			}else {
 
+				System.out.println( "Done Broadcasting. Terminating agent : " + getLocalName() );
+				if (!joinCompaitbleList.isEmpty()) {
 
-				final Gson gson = new Gson();
-				try { 
-					ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
+					try { 
+						ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-					returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
-					listToSB.setCurrentPassenger(passengerData);
-					listToSB.setJoinPassengerList(joinCompaitbleList);
-					msg.setConversationId("passtoSBJoin");  
-					String jsonString = gson.toJson(listToSB);
-					msg.setContent(jsonString);
-					msg.setContentObject(listToSB); 
-					msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
-					send(msg);
+						returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
+						listToSB.setCurrentPassenger(passengerData);
+						listToSB.setJoinPassengerList(joinCompaitbleList);
+						msg.setConversationId("passtoSBJoin");   
+						msg.setContentObject(listToSB); 
+						msg.addReceiver(new AID("JadeSBSocket", AID.ISLOCALNAME)); 
+						send(msg);
 
-				} catch (java.io.IOException e) {
-					e.printStackTrace();
-				}
-				System.out.println(getLocalName() + " :Done Broadcasting. Terminating agent");
-				for (passengerDTO passenger : joinCompaitbleList) {
-					System.out.println(passenger.getPasName() +" : " + passenger.getDesplace_id());
-				}
+
+						for (JoinRequestDTO passenger : joinCompaitbleList) {
+							System.out.println(passenger.getJoinReqId() +" : " + passenger.getDesplace_id());
+						}
+					} catch (java.io.IOException e) {
+						e.printStackTrace();
+					}
+
+				} 
+
+
 				doDelete(); 
 
 			}
@@ -217,8 +218,6 @@ public class PassengerAgent extends Agent {
 			if (placebroadtMsg != null) { 
 				if( placebroadtMsg.getContent().equals(passengerData.getDesplace_id()) && !isindestPlaceIdCheckednequlList(placebroadtMsg.getSender().getLocalName())) {
 
-					//System.out.println("Received request to ride from: " + placebroadtMsg.getSender().getLocalName());
-
 
 					try {
 						ACLMessage response = placebroadtMsg.createReply();
@@ -242,13 +241,35 @@ public class PassengerAgent extends Agent {
 
 
 				try {
-					comparePassenger = (passengerDTO) joinpassdataMsg.getContentObject();
-					//System.out.println("Compare ID: " + comparePassenger.getPasId());
+					comparePassenger = (JoinRequestDTO) joinpassdataMsg.getContentObject();
+
 					double distance = haversine(comparePassenger.getStartLat(), comparePassenger.getStartLon(), passengerData.getStartLat(), passengerData.getStartLon());
 					if (distance <= closeradius) {
 						System.out.println(getLocalName()+" : Join match: " + placebroadtMsg.getSender().getLocalName());
 
 						joinCompaitbleList.add(comparePassenger);
+					}
+
+					if(joinCompaitbleList.size() >= 1) {
+
+
+						try { 
+							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
+
+							returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
+							listToSB.setCurrentPassenger(passengerData);
+							listToSB.setJoinPassengerList(joinCompaitbleList);
+							msg.setConversationId("passtoSBJoin");  
+							//String jsonString = gson.toJson(listToSB);
+							//msg.setContent(jsonString);
+							msg.setContentObject(listToSB); 
+							msg.addReceiver(new AID("JadeSBSocket", AID.ISLOCALNAME)); 
+							send(msg);
+							joinCompaitbleList.clear();
+						} catch (java.io.IOException e) {
+							e.printStackTrace();
+						}
+
 					}
 
 				} catch (UnreadableException e) { 
@@ -266,13 +287,13 @@ public class PassengerAgent extends Agent {
 
 
 
-		private  boolean isindestPlaceIdCheckednequlList(String joinpassname) {
+		public  boolean isindestPlaceIdCheckednequlList(String joinpassname) {
 			return destPlaceIdCheckednequlList.contains(joinpassname);
 
 		}
 
 
-		private static final double EARTH_RADIUS = 6371.0; // Earth radius in kilometers
+		public static final double EARTH_RADIUS = 6371.0; // Earth radius in kilometers
 
 		public static double haversine(double lat1, double lon1, double lat2, double lon2) {
 			double dLat = Math.toRadians(lat2 - lat1);

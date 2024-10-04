@@ -45,3 +45,6 @@ local.properties
 # Eclipse Core      
 .project
 .classpath
+
+
+.src\main\resources\application.properties

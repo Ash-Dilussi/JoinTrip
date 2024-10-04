@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor 
-public class ReturnPasstoSBDTO {
+public class JoinResponseListDTO {
 
 
-	private PassengerDTO currentPassenger;
+	private JoinRequestDTO currentPassenger;
 
-	private List<PassengerDTO> joinPassengerList = new ArrayList<>();
+	private List<JoinRequestDTO> joinPassengerList = new ArrayList<>();
 }
