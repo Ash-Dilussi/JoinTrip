@@ -1,17 +1,25 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.Gson;
 
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -33,9 +41,11 @@ public class PassengerTCPListner extends Agent {
 		}
 		System.out.println( getLocalName() + " started. Listening for registrations...");
 		AtomicReference<String> message = new AtomicReference<>("");
+		addBehaviour(new WaitformsgBehaviour());
+
 		// new thread to listen for incoming calls
 		new Thread(() -> {
-			try (ServerSocket serverSocket = new ServerSocket(8082)) {
+			try (ServerSocket serverSocket = new ServerSocket(80823)) {
 
 
 				while (true) {
@@ -82,7 +92,7 @@ public class PassengerTCPListner extends Agent {
 				Gson gson = new Gson();
 
 
-				passengerDTO passengerData = gson.fromJson(this.message.get(), passengerDTO.class);
+				JoinRequestDTO passengerData = gson.fromJson(this.message.get(), JoinRequestDTO.class);
 
 				//					DFAgentDescription template = new DFAgentDescription();
 				//					ServiceDescription sd = new ServiceDescription();
@@ -111,16 +121,16 @@ public class PassengerTCPListner extends Agent {
 
 		}
 
-		private void createPassengerAgent(passengerDTO passenger) {
+		private void createPassengerAgent(JoinRequestDTO passenger) {
 			try {
 				// Get the current container
 				AgentContainer container = getContainerController();
 
 				Object[] args = new Object[] { passenger };
 				// Create the agent
-				AgentController passengerAgent = container.createNewAgent(passenger.getPasId(), PassengerAgent.class.getName(), args);
+				AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), PassengerAgent.class.getName(), args);
 				passengerAgent.start();
-				System.out.println("Created agent: " +passenger.getPasId());
+				System.out.println("Created agent: " +passenger.getJoinReqId());
 			} catch (StaleProxyException e) {
 				e.printStackTrace();
 			}
@@ -128,6 +138,68 @@ public class PassengerTCPListner extends Agent {
 
 
 
+	}
+
+	class WaitformsgBehaviour extends CyclicBehaviour {
+		private final Gson gson = new Gson();
+
+		@Override
+		public void action() {
+
+			MessageTemplate passtoSBJoinTemplate = MessageTemplate.MatchConversationId("passtoSBJoin");
+			ACLMessage passtoSBJoinmsg = receive(passtoSBJoinTemplate);
+
+			System.out.println(getAgent().getLocalName() + ": Waiting for msg to send..."); 
+
+
+			if (passtoSBJoinmsg != null) {
+
+				try {
+					returnPasstoSBDTO messageOBjectContent = (returnPasstoSBDTO) passtoSBJoinmsg.getContentObject();
+					sendJoinlistToSpringBoot(messageOBjectContent);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				//ACLMessage response = msg.createReply();
+				//response.setPerformative(ACLMessage.INFORM);
+				//response.setContent("Msg Sent");
+				//send(response);
+			} else {
+				block();	
+			}
+		}
+
+		private void sendJoinlistToSpringBoot(returnPasstoSBDTO messageContent) throws Exception {
+
+			URI uri = new URI("http://localhost:8080/api/v1/passenger/masReponseJoin");
+
+			// Convert URI to URL
+			URL url = uri.toURL();
+
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST");
+			connection.setDoOutput(true);
+			connection.setRequestProperty("Content-Type", "application/json");
+
+
+			String jsonInputString = gson.toJson(messageContent);
+
+
+			try (OutputStream os = connection.getOutputStream()) {
+				byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+				os.write(input, 0, input.length);
+			}
+
+			// Get the response
+			int responseCode = connection.getResponseCode();
+			if (responseCode == HttpURLConnection.HTTP_OK) {
+				System.out.println("Message sent to Spring Boot successfully!");
+			} else {
+				System.out.println("Failed to send message. Response code: " + responseCode);
+			}
+
+			connection.disconnect();
+		}
 	}
 
 }

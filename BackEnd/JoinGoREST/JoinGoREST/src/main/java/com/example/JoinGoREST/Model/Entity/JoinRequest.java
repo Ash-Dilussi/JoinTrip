@@ -15,8 +15,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="TBL_Passenger")
-public class Passenger {
+@Table(name="TBL_JoinRequest")
+public class JoinRequest {
+
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE,
@@ -24,16 +25,14 @@ public class Passenger {
 	@SequenceGenerator(name = "joinReqId_generator",
 	sequenceName= "joinreq_Sequence",
 	allocationSize=1 )
-	private Integer Id;
-	private String Userid;
-	private String Username;
-	private String Addressline1;
-	private String Addressline2;
-	private String Town;
-	private String Email;
-	private String nic;
-	private Integer Phone;
-
+	private String Id;
+	private String userid; 
+	private String joinreqid;
+	private String desplace_id;
+	private float startLon =0;
+	private float startLat =0;
+	private float destLon =0;
+	private float destLat =0;
 
 
 

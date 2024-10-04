@@ -1,6 +1,7 @@
 package com.example.JoinGoREST.controllers;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,9 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.JoinGoREST.Model.DTO.ReturnPasstoSBDTO;
+import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
+import com.example.JoinGoREST.Model.DTO.JoinResponseListDTO;
+import com.example.JoinGoREST.Model.Entity.JoinRequest;
 import com.example.JoinGoREST.Model.Entity.Passenger;
 import com.example.JoinGoREST.service.Ipassenger;
 
@@ -26,7 +30,7 @@ public class PassengerController {
 
 
 	@GetMapping("/getallpassengers")
-	public List<Passenger> getAll(){
+	public List<JoinRequest> getAll(){
 		try {
 			return _passenger.getAllPassengers();
 
@@ -37,25 +41,47 @@ public class PassengerController {
 
 	}
 
-	@PostMapping("/createpassenger")
-	public Passenger createPassenger(@RequestBody Passenger passenger){
+	@PostMapping("/createPassUser")
+	public Passenger createPassengerUser(@RequestBody Passenger user) {
 		try {
-			return _passenger.createPassenger(passenger);
+
+
+			return _passenger.createPassenger(user);
+
+		}catch(Exception ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot retrieve  passengers"+ ex);
+
+		}
+
+	}
+
+	@GetMapping("/createJoinRequest")
+	public CompletableFuture<String> createJoinRequest(@RequestBody JoinRequestDTO joinrequest){
+		try {RestTemplate restTemplate = new RestTemplate();
+
+		//CompletableFuture<List<Passenger>> backendBResponse = restTemplate.postForObject();
+		return _passenger.createJoinRequest(joinrequest);
 		}
 		catch(Exception ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot create passenger"+ ex);
 		}
 	}
 
-	@PostMapping("/fromMAS")
-	public void fromMas(@RequestBody ReturnPasstoSBDTO joinPassengerListData) {
+	@PostMapping("/masReponseJoin")
+	public CompletableFuture<List<Passenger>>  fromMas(@RequestBody JoinResponseListDTO joinPassengerListData) {
 		try {
+
+
 			System.out.print("hit from mas"); 
-			System.out.println (joinPassengerListData);
-			System.out.println (joinPassengerListData.getJoinPassengerList());
+			System.out.println (joinPassengerListData.getCurrentPassenger().joinReqId);
+			for(JoinRequestDTO joinreq: joinPassengerListData.getJoinPassengerList() ) {
+				System.out.println (joinreq.joinReqId+" : "+ joinreq.desplace_id);
+			}
+
+			return _passenger.joinPassengerInform(joinPassengerListData);
 
 		}catch(Exception ex) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot create passenger"+ ex);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad match reponse"+ ex);
 		}
 	}
 
