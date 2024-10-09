@@ -11,15 +11,7 @@ public class JoinRequestDTO implements Serializable {
 	private double destLat;
 	private String desplace_id;
 
-
-	// Getters and setters
-	//	public String getPasName() {
-	//		return pasName;
-	//	}
-	//
-	//	public void setPasName(String pasName) {
-	//		this.pasName = pasName;
-	//	}
+ 
 
 	public String getJoinReqId() {
 		return joinReqId;

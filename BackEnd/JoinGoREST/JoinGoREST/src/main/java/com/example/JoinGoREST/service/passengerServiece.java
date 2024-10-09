@@ -4,17 +4,23 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.JoinGoREST.Model.DTO.JoinPassengerInfo;
 import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
 import com.example.JoinGoREST.Model.DTO.JoinResponseListDTO;
+import com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO;
 import com.example.JoinGoREST.Model.Entity.JoinRequest;
 import com.example.JoinGoREST.Model.Entity.MasJoinList;
 import com.example.JoinGoREST.Model.Entity.Passenger;
@@ -22,6 +28,7 @@ import com.example.JoinGoREST.repo.JoinRequestRepo;
 import com.example.JoinGoREST.repo.MasJoinListRepo;
 import com.example.JoinGoREST.repo.PassengerRepo;
 import com.google.gson.Gson;
+
 
 
 
@@ -35,8 +42,8 @@ public class passengerServiece implements Ipassenger {
 	@Autowired
 	private MasJoinListRepo _maslistrepo;
 
-	private final int TIMEOUT_MILLIS = 10000; // Total timeout duration (20 seconds)
-	private final int CHECK_INTERVAL = 2000; // Check every 5 seconds
+	private final int TIMEOUT_MILLIS = 17000; // Total timeout duration (20 seconds)
+	private final int CHECK_INTERVAL = 4000; // Check every 5 seconds
 
 
 
@@ -68,56 +75,84 @@ public class passengerServiece implements Ipassenger {
 		//return _passengerepo.save(passenger);
 	}
 
-
+	
 	private CompletableFuture<String> notifyJadeMAS(JoinRequestDTO registration) throws Exception {
-		// Send data to JADE's listener on port 12345 (example port)
-
-
+		 
+	
+		
+		JoinRequestDTO askingUser = registration;
 		return CompletableFuture.supplyAsync(() ->{
-
 			String response = null;
+			long startTime = System.currentTimeMillis();
 			try (Socket socket = new Socket("localhost", 8082);
 					PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-					BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+					//BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+							) {
 				//OutputStream output = socket.getOutputStream();
 				Gson gson = new Gson();
 				String jsonMessage = gson.toJson(registration);
 
-
-				// Send the JSON string over the socket
-				//PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+    
 				out.println(jsonMessage); 
-
-
-				long startTime = System.currentTimeMillis();
+ 
+				
 				while (response == null) {
-					// Wait for a response from the MAS (blocking call)
-					if (in.ready()) {
-						response = in.readLine(); // This will block until a response is received
-						System.out.println("Received from MAS: " + response);
-					}
+					 
+					//if ((System.currentTimeMillis() - startTime)% CHECK_INTERVAL  == 0) {
+			 
+						List<MasJoinList> joindbresponse = _maslistrepo.matchcall(askingUser.joinReqId);
+						
+						if(!joindbresponse.isEmpty()) {// && joindbresponse.getAskingReqid().equals(re)
+							List<ResponsePassengerDTO> tempJoinList = new ArrayList<>();
+							
+							for(MasJoinList item: joindbresponse) {
+								for(String ajoin: item.getJoinlistReqid()) {
+									
+									Passenger res = _passengerepo.getResponsePassforreqId(ajoin);
+									//JoinPassengerInfo result = _passengerepo.getResponsePassforreqId(ajoin);
+									
+									//List<ResponsePassengerDTO> res = _passengerepo.getjoinReponseUserInfo(ajoin);
+							
+									 
+									//ResponsePassengerDTO resultDTO= new ResponsePassengerDTO(result.getUserId(),result.getUsername(), result.getPhone(),result.getTown());
+									//var username1 = result.getTown();
+									//System.out.println("from loop  to dto"+ username1);
+									tempJoinList.add(new ResponsePassengerDTO(res.getUserid(),res.getUsername(),res.getPhone(),res.getTown()));
+									//tempJoinList.add(_passengerepo.getResponsePassforreqId(ajoin)); 
+								}
+									
+							}
+							response = "got a match "+ registration.joinReqId+ "  ::-> "+tempJoinList;
+							System.out.println("Received from MAS: " +CHECK_INTERVAL+ response);
+						}
+						
+					//}
 
-					if(System.currentTimeMillis() - startTime > 11000) {
-						response = "value assigend after 3sec";
-					}
-
-					// Check if timeout has occurred
+//				     
 					if (System.currentTimeMillis() - startTime > TIMEOUT_MILLIS) {
 						System.out.println("Timeout waiting for response from MAS.");
-						break; // Exit the loop if timeout occurs
+						response ="Timeout waiting for response from MAS."; // Exit the loop if timeout occurs
 					}
 
 					// Sleep for the specified check interval
-					//Thread.sleep(CHECK_INTERVAL);
-				}// Send JSON
-
-				//response= in.readLine();
-				//System.out.println("Received from MAS: " + response);
+					Thread.sleep(CHECK_INTERVAL);
+				}
+				 
 
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
-			return response;
+			
+			 long currentTime = System.currentTimeMillis() - startTime ;
+			    long seconds = currentTime / 1000; // Total seconds
+		        long hours = seconds / 3600; // Total hours
+		        seconds %= 3600; // Remaining seconds after hours
+		        long minutes = seconds / 60; // Total minutes
+		        seconds %= 60; 
+		       // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		        String formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+		        
+			return formattedTime +" ::> "+ response ;
 		});
 
 
@@ -132,24 +167,22 @@ public class passengerServiece implements Ipassenger {
 
 
 	@Override
-	@Async
-	public CompletableFuture<List<Passenger>> joinPassengerInform(JoinResponseListDTO joinPassengerListData) {
-
-		List<Passenger> responsePassengerList = new ArrayList<>();
-
+	//@Async
+	public String joinPassengerInform(String jsonfromMAS) {
+		Gson gson = new Gson(); 
+		MasJoinList masmsg  = new MasJoinList(); 
+		JoinResponseListDTO joinPassengerListData = gson.fromJson(jsonfromMAS, JoinResponseListDTO.class);
+		masmsg.setAskingReqid(joinPassengerListData.getCurrentPassenger().joinReqId);
+		List<String> tempList = new ArrayList<String>();
 		for(JoinRequestDTO joinreq: joinPassengerListData.getJoinPassengerList() ) {
-			System.out.println(joinreq.userId);
-			Passenger responsePassenger = _passengerepo.getjoinReponseUserInfo(joinreq.userId);
-			System.out.println(responsePassenger.getUsername());
-			if (responsePassenger != null) {
-				responsePassengerList.add(responsePassenger);
-			}
-		}
-
-		for(Passenger response: responsePassengerList) {
-			System.out.println(response.getUsername());
-		}
-		return CompletableFuture.completedFuture(responsePassengerList);
+			tempList.add(joinreq.joinReqId);
+		 }
+		masmsg.setJoinlistReqid(tempList);
+ 
+		
+		System.out.println("Entering to saving the req");
+		joinlistfromMAS(masmsg);
+		return "Received";
 	}
 
 
@@ -161,6 +194,7 @@ public class passengerServiece implements Ipassenger {
 
 
 	@Override
+	@Transactional
 	public void joinlistfromMAS(MasJoinList msg) {
 		// TODO Auto-generated method stub
 

@@ -1,6 +1,8 @@
 package com.example.JoinGoREST.Model.Entity;
 
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +22,7 @@ public class MasJoinList {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	Integer Id;
-	String list;
+	String askingReqid;
+	List<String> joinlistReqid;
 
 }

@@ -45,7 +45,7 @@ public class PassengerTCPListner extends Agent {
 
 		// new thread to listen for incoming calls
 		new Thread(() -> {
-			try (ServerSocket serverSocket = new ServerSocket(80823)) {
+			try (ServerSocket serverSocket = new ServerSocket(8082)) {
 
 
 				while (true) {
@@ -62,7 +62,7 @@ public class PassengerTCPListner extends Agent {
 							// Add the behavior to handle the received message
 							addBehaviour(new WaitTCPListenBehaviour(message));
 						}
-						System.out.println("Received registration to tcp: " + message);
+						//System.out.println("Received registration to tcp: " + message);
 
 					}
 					// Close the socket
@@ -130,7 +130,7 @@ public class PassengerTCPListner extends Agent {
 				// Create the agent
 				AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), PassengerAgent.class.getName(), args);
 				passengerAgent.start();
-				System.out.println("Created agent: " +passenger.getJoinReqId());
+				//System.out.println("Created agent: " +passenger.getJoinReqId());
 			} catch (StaleProxyException e) {
 				e.printStackTrace();
 			}
