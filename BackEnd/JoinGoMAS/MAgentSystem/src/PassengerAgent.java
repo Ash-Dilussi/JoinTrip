@@ -1,11 +1,18 @@
 import java.io.IOException;
+import java.io.Serializable;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -18,12 +25,13 @@ import jade.lang.acl.UnreadableException;
 public class PassengerAgent extends Agent {
 
 	private long startTime;
-	private static final long TIME_LIMIT = 80000;
+	private static final long TIME_LIMIT = 10000;
 	private static int 	closeradius= 2;
 	private  JoinRequestDTO passengerData = new JoinRequestDTO();
 	private JoinRequestDTO comparePassenger = new JoinRequestDTO();
 	private List<String> destPlaceIdCheckednequlList = new ArrayList<>();
-	private List<JoinRequestDTO> joinCompaitbleList = new ArrayList<>();
+	private List<JoinRequestDTO> joinCompaitbleList = new ArrayList<>(); 
+	private List<String> messagedAgents = new ArrayList<>();
 
 
 
@@ -52,15 +60,27 @@ public class PassengerAgent extends Agent {
 		} else {
 			System.out.println("No data received.");
 		}
+		
 		destPlaceIdCheckednequlList.add(getLocalName());
-		System.out.println(getAID().getLocalName() + ": A Join Passenger agent created.");
-		// addBehaviour(new FindTaxiBehaviour());
-		//addBehaviour(new callfromTCPListner());
-		addBehaviour(new destinationBroadcast());
+		messagedAgents.add(getLocalName()); 
+		
+		System.out.println("++Created agent: " +getAID().getLocalName() + ": A Join Passenger agent created.");
+	 
+		addBehaviour(new agentdeteTimer(this, TIME_LIMIT));
 		addBehaviour(new sendorinfotoMatch());
+		addBehaviour(new destinationBroadcast());
+		
+		addBehaviour(new firstnewreqplaceidone()); 
+		addBehaviour(new broadcastNewarrival()); 
+		
+	
 
 
 	}
+	
+	 
+	
+	
 
 
 	class FindTaxiBehaviour extends OneShotBehaviour {
@@ -91,97 +111,113 @@ public class PassengerAgent extends Agent {
 
 		}
 	}
-
-
-	class callfromTCPListner  extends CyclicBehaviour{
+ 
+	class firstnewreqplaceidone extends OneShotBehaviour{
 
 		@Override
-		public void action(){
+		public void action() {
 
-
-			// Receive messages from PassengerAgents and respond to ride requests
-			ACLMessage msg = receive();
-			if (msg != null){ 
-				System.out.println(getAgent().getLocalName() + ": Waiting for new passenger data kk...");
-				try{
-					//passengerDTO receivedData = (passengerDTO) msg.getContentObject();
-					passengerData = (JoinRequestDTO) msg.getContentObject();
-					//setPassengerData(receivedData);
-
-					System.out.println("Received passenger data:");
-					//System.out.println("ID: " + passengerData.getPasName());
-					//	System.out.println("Name: " + passengerData.getPasName());
-
-
-					System.out.println(getAgent().getLocalName() + ": Ride requested by " + msg.getSender().getLocalName() + " "  );
-
-
-
-
-
-				}catch(UnreadableException e) {   e.printStackTrace();}
-
-
-			} else {
-				block(); // Block until a message is received
+			DFAgentDescription template = new DFAgentDescription();
+			ServiceDescription sdnew = new ServiceDescription();
+			sdnew.setType("passenger");
+			template.addServices(sdnew);
+			 
+			try {
+			DFAgentDescription[] result = DFService.search(this.getAgent(), template);
+			if (result.length > 0) {
+				for (DFAgentDescription dfAgent : result) {
+					//AID agentAID = dfAgent.getName();
+					if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
+						 
+					String mypalceId = passengerData.getDesplace_id();
+					ACLMessage msgplaceinfo = new ACLMessage(ACLMessage.REQUEST); 
+					msgplaceinfo.addReceiver(dfAgent.getName()); 
+					msgplaceinfo.setConversationId("placeId");  
+					msgplaceinfo.setContent(mypalceId);			
+					send(msgplaceinfo);
+					  
+					}
+					 
+				}
 			}
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+ 
+		}
+		
+	}
+	
+	
+	class broadcastNewarrival extends OneShotBehaviour{
+		@Override
+		public void action() {
+			
+			DFAgentDescription template = new DFAgentDescription();
+			ServiceDescription sdnew = new ServiceDescription();
+			sdnew.setType("passenger");
+			template.addServices(sdnew);
+			 
+			try {
+			DFAgentDescription[] result = DFService.search(this.getAgent(), template);
+			if (result.length > 0) {
+				for (DFAgentDescription dfAgent : result) {
+ 
+					if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
+						
+					ACLMessage msgnewalert = new ACLMessage(ACLMessage.REQUEST); 
+					msgnewalert.addReceiver(dfAgent.getName());
+					msgnewalert.setConversationId("newReqNotice");  
+					msgnewalert.setContent("new Request Came!!");
+			
+					send(msgnewalert);
+					
+ 
+					} 
+				}
+			}
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
 
+		
 		}
 	}
 
-	class destinationBroadcast extends  CyclicBehaviour{
+	class agentdeteTimer extends TickerBehaviour{
 
-
+		 
+		public agentdeteTimer(Agent a, long period) {
+			super(a, period);
+			// TODO Auto-generated constructor stub
+		}
 
 		@Override
-		public void action(){
-
-			long elapsedTime = System.currentTimeMillis() - startTime;
-			if (elapsedTime < TIME_LIMIT) { 
-
-				DFAgentDescription template = new DFAgentDescription();
-				ServiceDescription sd = new ServiceDescription();
-				sd.setType("passenger");
-				template.addServices(sd);
-				try { 
-					String mypalceId = passengerData.getDesplace_id();
-					DFAgentDescription[] result = DFService.search(this.getAgent(), template);
-					if (result.length > 0) {
-						for (DFAgentDescription dfAgent : result) {
-							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-							msg.setConversationId("placeId");
-							msg.addReceiver(dfAgent.getName());
-							msg.setContent( mypalceId);
-							send(msg);
-
-							//block(1000); // Block for 1 seconds to wait for responses
-						}
-					}
-				} catch (FIPAException fe) {
-					fe.printStackTrace(); 
-
-
-				}
-			}else {
-
+        protected void onTick() {
+			long elapsedTime = System.currentTimeMillis() - startTime; 
+			if (elapsedTime >= TIME_LIMIT) { 
+				
 				System.out.println( "Done Broadcasting. Terminating agent : " + getLocalName() );
 				if (!joinCompaitbleList.isEmpty()) {
 
 					try { 
-						ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
+						
+
+						ACLMessage msgtoSB = new ACLMessage(ACLMessage.REQUEST);  
 
 						returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
 						listToSB.setCurrentPassenger(passengerData);
 						listToSB.setJoinPassengerList(joinCompaitbleList);
-						msg.setConversationId("passtoSBJoin");   
-						msg.setContentObject(listToSB); 
-						msg.addReceiver(new AID("JadeSBSocket", AID.ISLOCALNAME)); 
-						send(msg);
-
-
+						msgtoSB.setConversationId("passtoSBJoin");   
+						msgtoSB.setContentObject(listToSB); 
+						msgtoSB.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
+						send(msgtoSB);
+						
+ 
 						for (JoinRequestDTO passenger : joinCompaitbleList) {
 							System.out.println(passenger.getJoinReqId() +" : " + passenger.getDesplace_id());
 						}
+						  
 					} catch (java.io.IOException e) {
 						e.printStackTrace();
 					}
@@ -189,16 +225,73 @@ public class PassengerAgent extends Agent {
 				} 
 
 
-				doDelete(); 
-
+				doDelete();
+				
 			}
-
-
+			
 		}
-
-
-
+		
 	}
+	
+	class destinationBroadcast extends  CyclicBehaviour{
+
+ 
+		@Override
+		public void action(){
+			
+
+			MessageTemplate newReqNoticeTemplate = MessageTemplate.MatchConversationId("newReqNotice");
+			ACLMessage newReqNoticeMsg = receive(newReqNoticeTemplate);
+			
+		 
+			if (newReqNoticeMsg != null) {  
+				String mypalceId = passengerData.getDesplace_id();
+				
+				ACLMessage response = newReqNoticeMsg.createReply();
+				response.setPerformative(ACLMessage.INFORM);
+				response.setConversationId("placeId"); 
+				response.setContent(mypalceId);
+				send(response);
+				
+//				DFAgentDescription template = new DFAgentDescription();
+//				ServiceDescription sd = new ServiceDescription();
+//				sd.setType("passenger");
+//				template.addServices(sd);
+//				try { 
+//					//String mypalceId = passengerData.getDesplace_id();
+//					DFAgentDescription[] result = DFService.search(this.getAgent(), template);
+//					if (result.length > 0) {
+//						for (DFAgentDescription dfAgent : result) {
+//							 
+//							if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
+//								
+//						    System.out.println("Broadcast From: "+ getLocalName());
+//							ACLMessage msgbrdcast = new ACLMessage(ACLMessage.REQUEST);  
+//							msgbrdcast.addReceiver(dfAgent.getName());
+//							msgbrdcast.setConversationId("placeId"); 
+//							msgbrdcast.setContent(mypalceId);
+//					
+//							send(msgbrdcast);
+//							
+//							}
+//							  
+//						}
+//					}
+//				} catch (FIPAException fe) {
+//					fe.printStackTrace(); 
+//
+//
+//				}
+			 
+			}else {
+				block();
+			}
+			 
+		}
+		 
+	}
+	
+	
 
 	class sendorinfotoMatch extends CyclicBehaviour{
 
@@ -218,11 +311,11 @@ public class PassengerAgent extends Agent {
 			if (placebroadtMsg != null) { 
 				if( placebroadtMsg.getContent().equals(passengerData.getDesplace_id()) && !isindestPlaceIdCheckednequlList(placebroadtMsg.getSender().getLocalName())) {
 
-
+      
 					try {
 						ACLMessage response = placebroadtMsg.createReply();
 						response.setConversationId("joinpassenger");
-						response.setPerformative(ACLMessage.INFORM);
+						response.setPerformative(ACLMessage.INFORM); 
 						response.setContent("infrotoMatch"); 
 						response.setContentObject(passengerData); 
 						send(response);
@@ -233,8 +326,7 @@ public class PassengerAgent extends Agent {
 					} 
 
 				}
-
-
+ 
 			}
 
 			if(joinpassdataMsg != null){
@@ -245,26 +337,26 @@ public class PassengerAgent extends Agent {
 
 					double distance = haversine(comparePassenger.getStartLat(), comparePassenger.getStartLon(), passengerData.getStartLat(), passengerData.getStartLon());
 					if (distance <= closeradius) {
-						System.out.println(getLocalName()+" : Join match: " + placebroadtMsg.getSender().getLocalName());
-
+						System.out.println(getLocalName()+" : Join match to: " + joinpassdataMsg.getSender().getLocalName());
+ 
 						joinCompaitbleList.add(comparePassenger);
 					}
 
-					if(joinCompaitbleList.size() >= 1) {
+					if(joinCompaitbleList.size() >= 3) {
 
 
 						try { 
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
 							returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
-							listToSB.setCurrentPassenger(passengerData);
+							 listToSB.setCurrentPassenger(passengerData);
 							listToSB.setJoinPassengerList(joinCompaitbleList);
-							msg.setConversationId("passtoSBJoin");  
-							//String jsonString = gson.toJson(listToSB);
-							//msg.setContent(jsonString);
+							msg.setConversationId("passtoSBJoin");   
+						 
 							msg.setContentObject(listToSB); 
-							msg.addReceiver(new AID("JadeSBSocket", AID.ISLOCALNAME)); 
+							msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
 							send(msg);
+						
 							joinCompaitbleList.clear();
 						} catch (java.io.IOException e) {
 							e.printStackTrace();
@@ -313,18 +405,4 @@ public class PassengerAgent extends Agent {
 
 
 
-
-
-
-
-//      System.out.println(getAgent().getLocalName() + ": Searching for available taxis...");
-//// Send a message to all TaxiAgents to find an available taxi
-//ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-//
-//
-//AID raid= new AID("arun", AID.ISLOCALNAME);
-//            msg.addReceiver(raid);
-//            msg.setContent("Need a ride!");
-//
-//send(msg);
-//block(5000); // Block for 1 seconds to wait for responses
+ 

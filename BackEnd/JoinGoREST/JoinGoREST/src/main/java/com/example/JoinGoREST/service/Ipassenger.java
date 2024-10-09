@@ -14,7 +14,7 @@ public interface Ipassenger {
 	List<JoinRequest> getAllPassengers();
 	CompletableFuture<String> createJoinRequest(JoinRequestDTO joinrequest);
 	Passenger createPassenger(Passenger passenger);
-	CompletableFuture<List<Passenger>> joinPassengerInform(JoinResponseListDTO joinPassengerListData);
+	String joinPassengerInform(String joinPassengerListData);
 	void joinlistfromMAS(MasJoinList msg);
 
 

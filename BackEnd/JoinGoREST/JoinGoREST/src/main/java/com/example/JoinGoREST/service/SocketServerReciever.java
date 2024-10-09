@@ -19,7 +19,7 @@ import jakarta.annotation.PreDestroy;
 public class SocketServerReciever {
 
 	private ServerSocket serverSocket;
-	private final int PORT = 8082; // Use the same port as JADE
+	private final int PORT = 8085; // Use the same port as JADE
 
 	@Autowired
 	private Ipassenger _passenger;
@@ -52,8 +52,8 @@ public class SocketServerReciever {
 				while ((inputLine = in.readLine()) != null) {
 					System.out.println("Received from JADE: " + inputLine);
 					// Process the inputLine as needed
-					masmsg.setList(inputLine);
-					_passenger.joinlistfromMAS(masmsg);
+					//masmsg.setList(inputLine);
+					//_passenger.joinlistfromMAS(masmsg);
 					// Optionally, send a response back to JADE
 					//String response = "Echo: " + inputLine;
 					//out.println(response);

@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 
 public class ResponsePassengerDTO{
 
-	public String Id; 
-	public String Username;
-	public Integer Phone;
-	public String Town;
+	public String userid; 
+	public String username;
+	public Integer phone;
+	public String town;
 
 }
