@@ -6,9 +6,10 @@ List<?> list;  // A list that can hold any type (wildcard)
 List DTO conversions:
 	List<Passenger> res = _passengerepo.getResponsePassforreqId(ajoin);
 
-									res.stream().map(p -> new ResponsePassengerDTO(
-											p.getUserid(),
-											p.getUsername(),
-											p.getPhone(),
-											p.getTown())).
-							        collect(Collectors.toList());
+	res.stream().map(p -> new ResponsePassengerDTO(
+			 p.getUserid(),
+			 p.getUsername(),
+			 p.getPhone(),
+			 p.getTown())).
+			
+collect(Collectors.toList());

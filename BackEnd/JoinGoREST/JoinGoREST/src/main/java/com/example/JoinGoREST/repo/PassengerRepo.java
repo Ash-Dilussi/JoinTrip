@@ -24,8 +24,5 @@ public interface PassengerRepo extends JpaRepository<Passenger , Integer>{
 //	@Query (value="SELECT t1.userid , t1.username, t1.phone, t1.town  FROM tbl_passenger t1 INNER JOIN tbl_join_request t2 ON t1.userid = t2.userid WHERE t2.joinreqid = :joinreqId ", nativeQuery= true)
 //	JoinPassengerInfo getResponsePassforreqId(String joinreqId);
 
-
-//    @Query(value = "SELECT new com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO(t1.userid, t1.username, t1.phone, t1.town) FROM tbl_passenger t1 INNER JOIN tbl_join_request t2 ON t1.userid = t2.userid WHERE t2.joinreqid = :joinreqId")
-//    ResponsePassengerDTO getResponsePassforreqId(String joinreqId);
-
+ 
 }

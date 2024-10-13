@@ -109,16 +109,9 @@ public class passengerServiece implements Ipassenger {
 								for(String ajoin: item.getJoinlistReqid()) {
 									
 									Passenger res = _passengerepo.getResponsePassforreqId(ajoin);
-									//JoinPassengerInfo result = _passengerepo.getResponsePassforreqId(ajoin);
-									
-									//List<ResponsePassengerDTO> res = _passengerepo.getjoinReponseUserInfo(ajoin);
-							
-									 
-									//ResponsePassengerDTO resultDTO= new ResponsePassengerDTO(result.getUserId(),result.getUsername(), result.getPhone(),result.getTown());
-									//var username1 = result.getTown();
-									//System.out.println("from loop  to dto"+ username1);
+							 
 									tempJoinList.add(new ResponsePassengerDTO(res.getUserid(),res.getUsername(),res.getPhone(),res.getTown()));
-									//tempJoinList.add(_passengerepo.getResponsePassforreqId(ajoin)); 
+							 
 								}
 									
 							}

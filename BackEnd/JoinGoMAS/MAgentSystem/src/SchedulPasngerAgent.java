@@ -1,9 +1,11 @@
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +17,7 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -24,10 +27,10 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 // Define a PassengerAgent class representing a passenger seeking a taxi ride
-public class PassengerAgent extends Agent {
+public class SchedulPasngerAgent extends Agent {
 
-	private long startTime;
-	private static final long TIME_LIMIT = 10000;
+	 
+	private static final long TIME_LIMIT = 300000;
 	private static int 	closeradius= 2;
 	private  JoinRequestDTO passengerData = new JoinRequestDTO();
 	private JoinRequestDTO comparePassenger = new JoinRequestDTO();
@@ -40,11 +43,11 @@ public class PassengerAgent extends Agent {
 	@Override
 	protected void setup() {
 
-		startTime = System.currentTimeMillis();
-
+		 
+		try {
 
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType("passenger");
+		sd.setType("schedulepassenger");
 		sd.setName(getLocalName());
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -66,7 +69,18 @@ public class PassengerAgent extends Agent {
 		destPlaceIdCheckednequlList.add(getLocalName());
 		messagedAgents.add(getLocalName()); 
 		
-		System.out.println("++Created agent: " +getAID().getLocalName() + ": A Join Passenger agent created.");
+		
+			long delay = passengerData.getDelelteTime().getTime() - System.currentTimeMillis();
+			if(delay>0) {
+				//addBehaviour(new agentscheduledelteTime(this,delay));
+				addBehaviour(new agentscheduledelteTime(this,passengerData.getDelelteTime()));
+
+			}
+	 
+		
+		
+		System.out.println("++Scedule agent Created : " +getAID().getLocalName() + ": scheduled: " +passengerData.getDelelteTime() );
+		
 	 
 		addBehaviour(new agentdeteTimer(this, TIME_LIMIT));
 		addBehaviour(new sendorinfotoMatch());
@@ -76,14 +90,14 @@ public class PassengerAgent extends Agent {
 		addBehaviour(new broadcastNewarrival()); 
 		
 	
-
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 	
-	 
-	
-	
-
+	  
 
 	class FindTaxiBehaviour extends OneShotBehaviour {
 
@@ -186,6 +200,25 @@ public class PassengerAgent extends Agent {
 		}
 	}
 
+	class agentscheduledelteTime extends WakerBehaviour{
+
+		public agentscheduledelteTime(Agent a, Date deleteTime) {
+			super(a, deleteTime);
+			// TODO Auto-generated constructor stub
+		}
+		@Override
+        protected void onWake() {
+			try {
+            System.out.println("Scheduled time reached: "+ passengerData.getDelelteTime()+" --Deleting agent... @ "+ getLocalName());
+            
+            doDelete(); // Terminate the agent
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+        }
+		
+		
+	}
 	class agentdeteTimer extends TickerBehaviour{
 
 		 
@@ -196,10 +229,7 @@ public class PassengerAgent extends Agent {
 
 		@Override
         protected void onTick() {
-			long elapsedTime = System.currentTimeMillis() - startTime; 
-			if (elapsedTime >= TIME_LIMIT) { 
-				
-				System.out.println( "Done Broadcasting. Terminating agent : " + getLocalName() );
+  
 				if (!joinCompaitbleList.isEmpty()) {
 
 					try { 
@@ -225,12 +255,7 @@ public class PassengerAgent extends Agent {
 					}
 
 				} 
-
-
-				doDelete();
-				
-			}
-			
+ 
 		}
 		
 	}
@@ -255,35 +280,7 @@ public class PassengerAgent extends Agent {
 				response.setContent(mypalceId);
 				send(response);
 				
-//				DFAgentDescription template = new DFAgentDescription();
-//				ServiceDescription sd = new ServiceDescription();
-//				sd.setType("passenger");
-//				template.addServices(sd);
-//				try { 
-//					//String mypalceId = passengerData.getDesplace_id();
-//					DFAgentDescription[] result = DFService.search(this.getAgent(), template);
-//					if (result.length > 0) {
-//						for (DFAgentDescription dfAgent : result) {
-//							 
-//							if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
-//								
-//						    System.out.println("Broadcast From: "+ getLocalName());
-//							ACLMessage msgbrdcast = new ACLMessage(ACLMessage.REQUEST);  
-//							msgbrdcast.addReceiver(dfAgent.getName());
-//							msgbrdcast.setConversationId("placeId"); 
-//							msgbrdcast.setContent(mypalceId);
-//					
-//							send(msgbrdcast);
-//							
-//							}
-//							  
-//						}
-//					}
-//				} catch (FIPAException fe) {
-//					fe.printStackTrace(); 
-//
-//
-//				}
+ 
 			 
 			}else {
 				block();
@@ -344,7 +341,7 @@ public class PassengerAgent extends Agent {
 						joinCompaitbleList.add(comparePassenger);
 					}
 
-					if(joinCompaitbleList.size()%3 == 0) {
+					if(joinCompaitbleList.size()%5 == 0) {
 
 
 						try { 
