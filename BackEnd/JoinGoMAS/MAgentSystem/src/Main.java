@@ -8,9 +8,8 @@ public class Main extends Agent {
 		try {
 
 
-			container.createNewAgent("Jade2SBAgent", JadetoSB.class.getName(), null).start();
-			//container.createNewAgent("JadeSBSocket", "JadeSBSocket", null).start();
-				container.createNewAgent("PortListenerAgent", "PassengerTCPListner", null).start();
+			container.createNewAgent("Jade2SBAgent", JadetoSB.class.getName(), null).start(); 
+			container.createNewAgent("PortListenerAgent", "PassengerTCPListner", null).start();
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -59,8 +59,7 @@ public class PassengerController {
 	@GetMapping("/createJoinRequest")
 	public CompletableFuture<String> createJoinRequest(@RequestBody JoinRequestDTO joinrequest){
 		try {RestTemplate restTemplate = new RestTemplate();
-
-		//CompletableFuture<List<Passenger>> backendBResponse = restTemplate.postForObject();
+ 
 		return _passenger.createJoinRequest(joinrequest);
 		}
 		catch(Exception ex) {
@@ -70,14 +69,9 @@ public class PassengerController {
 
 	@PostMapping("/masReponseJoin")
 	public String  fromMas(@RequestBody String joinPassengerListJSON) {
-		try {
+		try { 
 
-
-			System.out.println("Conrtoller: hit from mas: "+ joinPassengerListJSON); 
-			//System.out.println (joinPassengerListData.getCurrentPassenger().joinReqId);
-//			for(JoinRequestDTO joinreq: joinPassengerListData.getJoinPassengerList() ) {
-//				System.out.println (joinreq.joinReqId+" : "+ joinreq.desplace_id);
-//			}
+			System.out.println("Conrtoller: hit from mas: ");  
 
 			return _passenger.joinPassengerInform(joinPassengerListJSON);
 
