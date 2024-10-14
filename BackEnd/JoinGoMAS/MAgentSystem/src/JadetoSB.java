@@ -3,9 +3,12 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import com.google.gson.Gson;
 
+import DTO.returnPasstoSBDTO;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -44,7 +47,7 @@ public class JadetoSB extends Agent {
 			MessageTemplate passtoSBJoinTemplate = MessageTemplate.MatchConversationId("passtoSBJoin");
 			ACLMessage passtoSBJoinmsg = receive(passtoSBJoinTemplate);
 
-			System.out.println(getAgent().getLocalName() + ": Waiting for msg to send..."); 
+			//System.out.println(getAgent().getLocalName() + ": Waiting for msg to send..."); 
 
 
 			if (passtoSBJoinmsg != null) {
@@ -52,13 +55,13 @@ public class JadetoSB extends Agent {
 				try {
 					returnPasstoSBDTO messageOBjectContent = (returnPasstoSBDTO) passtoSBJoinmsg.getContentObject();
 					sendJoinlistToSpringBoot(messageOBjectContent);
+					 LocalTime currentTime = LocalTime.now();
+				        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+				        String formattedTime = currentTime.format(formatter);
+					System.out.println("Sent to SB from :: "+formattedTime +" -->"+ passtoSBJoinmsg.getSender().getLocalName());
 				} catch (Exception e) {
 					throw new RuntimeException(e);
-				}
-				//ACLMessage response = msg.createReply();
-				//response.setPerformative(ACLMessage.INFORM);
-				//response.setContent("Msg Sent");
-				//send(response);
+				} 
 			} else {
 				block();	
 			}
@@ -66,7 +69,7 @@ public class JadetoSB extends Agent {
 
 		private void sendJoinlistToSpringBoot(returnPasstoSBDTO messageContent) throws Exception {
 
-			URI uri = new URI("http://localhost:8080/api/v1/passenger/reponseJoin");
+			URI uri = new URI("http://localhost:8080/api/v1/passenger/masReponseJoin");
 
 			// Convert URI to URL
 			URL url = uri.toURL();

@@ -1,3 +1,8 @@
+package DTO;
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import jade.util.leap.Serializable;
 
 public class JoinRequestDTO implements Serializable {
@@ -10,16 +15,10 @@ public class JoinRequestDTO implements Serializable {
 	private double destLon;  // Use double for decimal values
 	private double destLat;
 	private String desplace_id;
-
-
-	// Getters and setters
-	//	public String getPasName() {
-	//		return pasName;
-	//	}
-	//
-	//	public void setPasName(String pasName) {
-	//		this.pasName = pasName;
-	//	}
+	private int isScheduled = 0;
+	private String deleteTime = null; 
+	private int isRequestDone =0;
+ 
 
 	public String getJoinReqId() {
 		return joinReqId;
@@ -75,6 +74,32 @@ public class JoinRequestDTO implements Serializable {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public Date getDelelteTime() throws ParseException {
+		 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		 Date ScheduleTime = dateFormat.parse(deleteTime);
+		return ScheduleTime;
+	}
+
+	public void setDelelteTime(String delelteTime) {
+		this.deleteTime = delelteTime;
+	}
+
+	public int getIsScheduled() {
+		return isScheduled;
+	}
+
+	public void setIsScheduled(int isScheduled) {
+		this.isScheduled = isScheduled;
+	}
+
+	public int getIsRequestDone() {
+		return isRequestDone;
+	}
+
+	public void setIsRequestDone(int isRequestDone) {
+		this.isRequestDone = isRequestDone;
 	}
 
 
