@@ -1,16 +1,11 @@
 package com.example.JoinGoREST.Model.Entity;
 
 
-import com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.NamedNativeQuery;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,10 +43,11 @@ public class Passenger {
 	private String Addressline2;
 	private String Town;
 	private String Email;
-	
+
+
 	@Column(nullable = false)
 	private String nic;
-	
+
 	@Column(nullable = false)
 	private Integer Phone;
 

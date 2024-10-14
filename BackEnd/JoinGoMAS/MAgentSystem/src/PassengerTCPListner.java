@@ -1,27 +1,18 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.Gson;
 
 import DTO.JoinRequestDTO;
- import DTO.returnPasstoSBDTO;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -95,9 +86,9 @@ public class PassengerTCPListner extends Agent {
 
 
 				JoinRequestDTO passengerData = gson.fromJson(this.message.get(), JoinRequestDTO.class);
- 
+
 				createPassengerAgent(passengerData);
- 		   
+
 			}else {
 				System.out.println("Message is null or empty");
 			}
@@ -112,8 +103,8 @@ public class PassengerTCPListner extends Agent {
 
 				Object[] args = new Object[] { passenger };
 				if(passenger.getIsScheduled() == 0) {
-				AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), PassengerAgent.class.getName(), args);
-				passengerAgent.start();
+					AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), PassengerAgent.class.getName(), args);
+					passengerAgent.start();
 				}else {
 					AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), SchedulPasngerAgent.class.getName(), args);
 					passengerAgent.start();
@@ -126,9 +117,9 @@ public class PassengerTCPListner extends Agent {
 
 	}
 
-	}
-	
-	
+}
+
+
 
 //	class WaitformsgBehaviour extends CyclicBehaviour {
 //		private final Gson gson = new Gson();
