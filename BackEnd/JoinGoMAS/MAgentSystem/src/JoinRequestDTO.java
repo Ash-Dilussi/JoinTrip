@@ -1,9 +1,10 @@
 import jade.util.leap.Serializable;
 
-public class passengerDTO implements Serializable {
+public class JoinRequestDTO implements Serializable {
 
-	private String pasName;
-	private String pasId;
+	//private String pasName;
+	private String userId;
+	private String joinReqId;
 	private double startLon; // Use double for decimal values
 	private double startLat; // Use double for decimal values
 	private double destLon;  // Use double for decimal values
@@ -12,20 +13,20 @@ public class passengerDTO implements Serializable {
 
 
 	// Getters and setters
-	public String getPasName() {
-		return pasName;
+	//	public String getPasName() {
+	//		return pasName;
+	//	}
+	//
+	//	public void setPasName(String pasName) {
+	//		this.pasName = pasName;
+	//	}
+
+	public String getJoinReqId() {
+		return joinReqId;
 	}
 
-	public void setPasName(String pasName) {
-		this.pasName = pasName;
-	}
-
-	public String getPasId() {
-		return pasId;
-	}
-
-	public void setPasId(String pasId) {
-		this.pasId = pasId;
+	public void setJoinReqId(String pasId) {
+		this.joinReqId = pasId;
 	}
 
 	public double getStartLon() {
@@ -66,6 +67,14 @@ public class passengerDTO implements Serializable {
 
 	public void setDesplace_id(String desplace_id) {
 		this.desplace_id = desplace_id;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 

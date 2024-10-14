@@ -6,24 +6,24 @@ import jade.util.leap.Serializable;
 public class returnPasstoSBDTO implements Serializable {
 
 
-	private passengerDTO currentPassenger;
+	private JoinRequestDTO currentPassenger;
 
-	private List<passengerDTO> joinPassengerList = new ArrayList<>();
+	private List<JoinRequestDTO> joinPassengerList = new ArrayList<>();
 
 
-	public List<passengerDTO> getJoinPassengerList() {
+	public List<JoinRequestDTO> getJoinPassengerList() {
 		return joinPassengerList;
 	}
 
-	public void setJoinPassengerList(List<passengerDTO> joinPassengerList) {
+	public void setJoinPassengerList(List<JoinRequestDTO> joinPassengerList) {
 		this.joinPassengerList = joinPassengerList;
 	}
 
-	public passengerDTO getCurrentPassenger() {
+	public JoinRequestDTO getCurrentPassenger() {
 		return currentPassenger;
 	}
 
-	public void setCurrentPassenger(passengerDTO currentPassenger) {
+	public void setCurrentPassenger(JoinRequestDTO currentPassenger) {
 		this.currentPassenger = currentPassenger;
 	}
 }
