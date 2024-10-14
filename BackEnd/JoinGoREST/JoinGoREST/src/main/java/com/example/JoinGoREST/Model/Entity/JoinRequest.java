@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="TBL_JoinRequest")
+@Table(name="TBL_Join_Request")
 public class JoinRequest {
 
 
@@ -32,7 +32,10 @@ public class JoinRequest {
 	private float startLon =0;
 	private float startLat =0;
 	private float destLon =0;
-	private float destLat =0;
+	private float destLat =0; 
+	private String deleteTime = null; 
+	private int requestStatus;
+	private int reqVehicletype=0;
 
 
 

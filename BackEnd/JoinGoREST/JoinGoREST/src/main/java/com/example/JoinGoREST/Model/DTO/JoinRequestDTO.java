@@ -18,8 +18,9 @@ public class JoinRequestDTO {
 	public float startLat =0;
 	public float destLon =0;
 	public float destLat =0;
-	private int isScheduled = 0;
-	private String deleteTime = null;
-	private int isRequestDone =0;
+	public int isScheduled = 0;
+	public String deleteTime = null; 
+	public int requestStatus =0;
+	public int reqVehicletype=0;
 
 }
