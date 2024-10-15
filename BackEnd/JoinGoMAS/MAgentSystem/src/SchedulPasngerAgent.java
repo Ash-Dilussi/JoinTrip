@@ -1,14 +1,8 @@
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import DTO.JoinRequestDTO;
 import DTO.returnPasstoSBDTO;
@@ -29,11 +23,11 @@ import jade.lang.acl.UnreadableException;
 // Define a PassengerAgent class representing a passenger seeking a taxi ride
 public class SchedulPasngerAgent extends Agent {
 
-	 
+
 	private static final long TIME_LIMIT = 300000;
 	private static int 	closeradius= 2;
 	private  JoinRequestDTO passengerData = new JoinRequestDTO();
-	private JoinRequestDTO comparePassenger = new JoinRequestDTO();
+	//private JoinRequestDTO comparePassenger = new JoinRequestDTO();
 	private List<String> destPlaceIdCheckednequlList = new ArrayList<>();
 	private List<JoinRequestDTO> joinCompaitbleList = new ArrayList<>(); 
 	private List<String> messagedAgents = new ArrayList<>();
@@ -43,61 +37,61 @@ public class SchedulPasngerAgent extends Agent {
 	@Override
 	protected void setup() {
 
-		 
+
 		try {
 
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType("schedulepassenger");
-		sd.setName(getLocalName());
-		DFAgentDescription dfd = new DFAgentDescription();
-		dfd.setName(getAID());
-		dfd.addServices(sd);
-		try {
-			DFService.register(this, dfd);
-		} catch (FIPAException fe) {
-			fe.printStackTrace();
-		}
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("schedulepassenger");
+			sd.setName(getLocalName());
+			DFAgentDescription dfd = new DFAgentDescription();
+			dfd.setName(getAID());
+			dfd.addServices(sd);
+			try {
+				DFService.register(this, dfd);
+			} catch (FIPAException fe) {
+				fe.printStackTrace();
+			}
 
-		Object[] args = getArguments();
-		if (args != null && args.length > 0) {
-			// Assuming the first argument is the PassengerDTO object
-			passengerData = (JoinRequestDTO) args[0]; 
-		} else {
-			System.out.println("No data received.");
-		}
-		
-		destPlaceIdCheckednequlList.add(getLocalName());
-		messagedAgents.add(getLocalName()); 
-		
-		
+			Object[] args = getArguments();
+			if (args != null && args.length > 0) {
+				// Assuming the first argument is the PassengerDTO object
+				passengerData = (JoinRequestDTO) args[0]; 
+			} else {
+				System.out.println("No data received.");
+			}
+
+			destPlaceIdCheckednequlList.add(getLocalName());
+			messagedAgents.add(getLocalName()); 
+
+
 			long delay = passengerData.getDelelteTime().getTime() - System.currentTimeMillis();
 			if(delay>0) {
 				//addBehaviour(new agentscheduledelteTime(this,delay));
 				addBehaviour(new agentscheduledelteTime(this,passengerData.getDelelteTime()));
 
 			}
-	 
-		
-		
-		System.out.println("++Scedule agent Created : " +getAID().getLocalName() + ": scheduled: " +passengerData.getDelelteTime() );
-		
-	 
-		addBehaviour(new agentdeteTimer(this, TIME_LIMIT));
-		addBehaviour(new sendorinfotoMatch());
-		addBehaviour(new destinationBroadcast());
-		
-		addBehaviour(new firstnewreqplaceidone()); 
-		addBehaviour(new broadcastNewarrival()); 
-		
-	
+
+
+
+			System.out.println("++Scedule agent Created : " +getAID().getLocalName() + ": scheduled: " +passengerData.getDelelteTime() );
+
+
+			addBehaviour(new agentdeteTimer(this, TIME_LIMIT));
+			addBehaviour(new sendorinfotoMatch());
+			addBehaviour(new destinationBroadcast());
+
+			addBehaviour(new firstnewreqplaceidone()); 
+			addBehaviour(new broadcastNewarrival()); 
+
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
-	
-	  
+
+
 
 	class FindTaxiBehaviour extends OneShotBehaviour {
 
@@ -127,7 +121,7 @@ public class SchedulPasngerAgent extends Agent {
 
 		}
 	}
- 
+
 	class firstnewreqplaceidone extends OneShotBehaviour{
 
 		@Override
@@ -137,66 +131,66 @@ public class SchedulPasngerAgent extends Agent {
 			ServiceDescription sdnew = new ServiceDescription();
 			sdnew.setType("passenger");
 			template.addServices(sdnew);
-			 
+
 			try {
-			DFAgentDescription[] result = DFService.search(this.getAgent(), template);
-			if (result.length > 0) {
-				for (DFAgentDescription dfAgent : result) {
-					//AID agentAID = dfAgent.getName();
-					if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
-						 
-					String mypalceId = passengerData.getDesplace_id();
-					ACLMessage msgplaceinfo = new ACLMessage(ACLMessage.REQUEST); 
-					msgplaceinfo.addReceiver(dfAgent.getName()); 
-					msgplaceinfo.setConversationId("placeId");  
-					msgplaceinfo.setContent(mypalceId);			
-					send(msgplaceinfo);
-					  
+				DFAgentDescription[] result = DFService.search(this.getAgent(), template);
+				if (result.length > 0) {
+					for (DFAgentDescription dfAgent : result) {
+						//AID agentAID = dfAgent.getName();
+						if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
+
+							String mypalceId = passengerData.getDesplace_id();
+							ACLMessage msgplaceinfo = new ACLMessage(ACLMessage.REQUEST); 
+							msgplaceinfo.addReceiver(dfAgent.getName()); 
+							msgplaceinfo.setConversationId("placeId");  
+							msgplaceinfo.setContent(mypalceId);			
+							send(msgplaceinfo);
+
+						}
+
 					}
-					 
 				}
+			} catch (FIPAException fe) {
+				fe.printStackTrace();
 			}
-		} catch (FIPAException fe) {
-			fe.printStackTrace();
+
 		}
- 
-		}
-		
+
 	}
-	
-	
+
+
 	class broadcastNewarrival extends OneShotBehaviour{
 		@Override
 		public void action() {
-			
+
 			DFAgentDescription template = new DFAgentDescription();
 			ServiceDescription sdnew = new ServiceDescription();
 			sdnew.setType("passenger");
 			template.addServices(sdnew);
-			 
-			try {
-			DFAgentDescription[] result = DFService.search(this.getAgent(), template);
-			if (result.length > 0) {
-				for (DFAgentDescription dfAgent : result) {
- 
-					if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
-						
-					ACLMessage msgnewalert = new ACLMessage(ACLMessage.REQUEST); 
-					msgnewalert.addReceiver(dfAgent.getName());
-					msgnewalert.setConversationId("newReqNotice");  
-					msgnewalert.setContent("new Request Came!!");
-			
-					send(msgnewalert);
-					
- 
-					} 
-				}
-			}
-		} catch (FIPAException fe) {
-			fe.printStackTrace();
-		}
 
-		
+			try {
+				DFAgentDescription[] result = DFService.search(this.getAgent(), template);
+				if (result.length > 0) {
+					for (DFAgentDescription dfAgent : result) {
+
+						if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
+
+							ACLMessage msgnewalert = new ACLMessage(ACLMessage.REQUEST); 
+							msgnewalert.addReceiver(dfAgent.getName());
+							msgnewalert.setConversationId("newReqNotice");  
+							msgnewalert.setContent("new Request Came!!");
+
+							send(msgnewalert);
+
+
+						} 
+					}
+				}
+			} catch (FIPAException fe) {
+				fe.printStackTrace();
+			}
+
+
 		}
 	}
 
@@ -207,90 +201,90 @@ public class SchedulPasngerAgent extends Agent {
 			// TODO Auto-generated constructor stub
 		}
 		@Override
-        protected void onWake() {
+		protected void onWake() {
 			try {
-            System.out.println("Scheduled time reached: "+ passengerData.getDelelteTime()+" --Deleting agent... @ "+ getLocalName());
-            
-            doDelete(); // Terminate the agent
+				System.out.println("Scheduled time reached: "+ passengerData.getDelelteTime()+" --Deleting agent... @ "+ getLocalName());
+
+				doDelete(); // Terminate the agent
 			}catch(Exception e) {
 				e.printStackTrace();
 			}
-        }
-		
-		
+		}
+
+
 	}
 	class agentdeteTimer extends TickerBehaviour{
 
-		 
+
 		public agentdeteTimer(Agent a, long period) {
 			super(a, period);
 			// TODO Auto-generated constructor stub
 		}
 
 		@Override
-        protected void onTick() {
-  
-				if (!joinCompaitbleList.isEmpty()) {
+		protected void onTick() {
 
-					try { 
-						
+			if (!joinCompaitbleList.isEmpty()) {
 
-						ACLMessage msgtoSB = new ACLMessage(ACLMessage.REQUEST);  
+				try { 
 
-						returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
-						listToSB.setCurrentPassenger(passengerData);
-						listToSB.setJoinPassengerList(joinCompaitbleList);
-						msgtoSB.setConversationId("passtoSBJoin");   
-						msgtoSB.setContentObject(listToSB); 
-						msgtoSB.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
-						send(msgtoSB);
-						
- 
-						for (JoinRequestDTO passenger : joinCompaitbleList) {
-							System.out.println(passenger.getJoinReqId() +" : " + passenger.getDesplace_id());
-						}
-						  
-					} catch (java.io.IOException e) {
-						e.printStackTrace();
+
+					ACLMessage msgtoSB = new ACLMessage(ACLMessage.REQUEST);  
+
+					returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
+					listToSB.setCurrentPassenger(passengerData);
+					listToSB.setJoinPassengerList(joinCompaitbleList);
+					msgtoSB.setConversationId("passtoSBJoin");   
+					msgtoSB.setContentObject((Serializable) listToSB); 
+					msgtoSB.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
+					send(msgtoSB);
+
+
+					for (JoinRequestDTO passenger : joinCompaitbleList) {
+						System.out.println(passenger.getJoinReqId() +" : " + passenger.getDesplace_id());
 					}
 
-				} 
- 
+				} catch (java.io.IOException e) {
+					e.printStackTrace();
+				}
+
+			} 
+
 		}
-		
+
 	}
-	
+
 	class destinationBroadcast extends  CyclicBehaviour{
 
- 
+
 		@Override
 		public void action(){
-			
+
 
 			MessageTemplate newReqNoticeTemplate = MessageTemplate.MatchConversationId("newReqNotice");
 			ACLMessage newReqNoticeMsg = receive(newReqNoticeTemplate);
-			
-		 
+
+
 			if (newReqNoticeMsg != null) {  
 				String mypalceId = passengerData.getDesplace_id();
-				
+
 				ACLMessage response = newReqNoticeMsg.createReply();
 				response.setPerformative(ACLMessage.INFORM);
 				response.setConversationId("placeId"); 
 				response.setContent(mypalceId);
 				send(response);
-				
- 
-			 
+
+
+
 			}else {
 				block();
 			}
-			 
+
 		}
-		 
+
 	}
-	
-	
+
+
 
 	class sendorinfotoMatch extends CyclicBehaviour{
 
@@ -310,7 +304,7 @@ public class SchedulPasngerAgent extends Agent {
 			if (placebroadtMsg != null) { 
 				if( placebroadtMsg.getContent().equals(passengerData.getDesplace_id()) && !isindestPlaceIdCheckednequlList(placebroadtMsg.getSender().getLocalName())) {
 
-      
+
 					try {
 						ACLMessage response = placebroadtMsg.createReply();
 						response.setConversationId("joinpassenger");
@@ -325,19 +319,19 @@ public class SchedulPasngerAgent extends Agent {
 					} 
 
 				}
- 
+
 			}
 
 			if(joinpassdataMsg != null){
 
 
 				try {
-					comparePassenger = (JoinRequestDTO) joinpassdataMsg.getContentObject();
+					JoinRequestDTO comparePassenger = (JoinRequestDTO) joinpassdataMsg.getContentObject();
 
 					double distance = haversine(comparePassenger.getStartLat(), comparePassenger.getStartLon(), passengerData.getStartLat(), passengerData.getStartLon());
 					if (distance <= closeradius) {
 						System.out.println(getLocalName()+" : Join match to: " + joinpassdataMsg.getSender().getLocalName());
- 
+
 						joinCompaitbleList.add(comparePassenger);
 					}
 
@@ -348,14 +342,14 @@ public class SchedulPasngerAgent extends Agent {
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
 							returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
-							 listToSB.setCurrentPassenger(passengerData);
+							listToSB.setCurrentPassenger(passengerData);
 							listToSB.setJoinPassengerList(joinCompaitbleList);
 							msg.setConversationId("passtoSBJoin");   
-						 
-							msg.setContentObject(listToSB); 
+
+							msg.setContentObject((Serializable) listToSB); 
 							msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
 							send(msg);
-						
+
 							joinCompaitbleList.clear();
 						} catch (java.io.IOException e) {
 							e.printStackTrace();
@@ -404,4 +398,4 @@ public class SchedulPasngerAgent extends Agent {
 
 
 
- 
+

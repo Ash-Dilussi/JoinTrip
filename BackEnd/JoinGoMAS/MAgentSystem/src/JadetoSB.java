@@ -44,7 +44,7 @@ public class JadetoSB extends Agent {
 		@Override
 		public void action() {
 
-			MessageTemplate passtoSBJoinTemplate = MessageTemplate.MatchConversationId("passtoSBJoin");
+			MessageTemplate passtoSBJoinTemplate = MessageTemplate.MatchConversationId("toJadetoSB");
 			ACLMessage passtoSBJoinmsg = receive(passtoSBJoinTemplate);
 
 			//System.out.println(getAgent().getLocalName() + ": Waiting for msg to send..."); 
@@ -53,11 +53,20 @@ public class JadetoSB extends Agent {
 			if (passtoSBJoinmsg != null) {
 
 				try {
+					String reddUrl = "";
+
+					if(passtoSBJoinmsg.getContent().equals("passengerAboutJoint")) { 
+						reddUrl = "http://localhost:8080/api/v1/passenger/masReponseJoin";
+
+					}else if(passtoSBJoinmsg.getContent().equals("DriverAboutMatch")) {
+						reddUrl = "http://localhost:8080/api/v1/driver/masReponseJoin";
+					}
+
 					returnPasstoSBDTO messageOBjectContent = (returnPasstoSBDTO) passtoSBJoinmsg.getContentObject();
-					sendJoinlistToSpringBoot(messageOBjectContent);
-					 LocalTime currentTime = LocalTime.now();
-				        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-				        String formattedTime = currentTime.format(formatter);
+					sendJoinlistToSpringBoot(messageOBjectContent, reddUrl);
+					LocalTime currentTime = LocalTime.now();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+					String formattedTime = currentTime.format(formatter);
 					System.out.println("Sent to SB from :: "+formattedTime +" -->"+ passtoSBJoinmsg.getSender().getLocalName());
 				} catch (Exception e) {
 					throw new RuntimeException(e);
@@ -67,9 +76,13 @@ public class JadetoSB extends Agent {
 			}
 		}
 
-		private void sendJoinlistToSpringBoot(returnPasstoSBDTO messageContent) throws Exception {
+		private void sendJoinlistToSpringBoot(returnPasstoSBDTO messageContent, String redirectURL) throws Exception {
 
-			URI uri = new URI("http://localhost:8080/api/v1/passenger/masReponseJoin");
+
+
+
+
+			URI uri = new URI(redirectURL);
 
 			// Convert URI to URL
 			URL url = uri.toURL();

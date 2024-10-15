@@ -1,5 +1,7 @@
 package com.example.JoinGoREST.Model.DTO;
 
+import java.sql.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +21,7 @@ public class JoinRequestDTO {
 	public float destLon =0;
 	public float destLat =0;
 	public int isScheduled = 0;
-	public String deleteTime = null; 
+	public Date deleteTime = null; 
 	public int requestStatus =0;
 	public int reqVehicletype=0;
 

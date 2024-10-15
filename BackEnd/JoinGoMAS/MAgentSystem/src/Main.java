@@ -10,6 +10,7 @@ public class Main extends Agent {
 
 			container.createNewAgent("Jade2SBAgent", JadetoSB.class.getName(), null).start(); 
 			container.createNewAgent("PortListenerAgent", "PassengerTCPListner", null).start();
+			container.createNewAgent("HTTPControllerAgent", JadeHTTPControllerAgent.class.getName(), null).start();
 
 		} catch (Exception e) {
 			e.printStackTrace();

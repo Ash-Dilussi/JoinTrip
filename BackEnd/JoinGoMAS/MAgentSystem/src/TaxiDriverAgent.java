@@ -1,4 +1,8 @@
+import java.io.Serializable;
+
+import DTO.TaxiRequestDTO;
 import DTO.TaxiStatusDTO;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -11,6 +15,9 @@ import jade.lang.acl.MessageTemplate;
 public class TaxiDriverAgent extends Agent{
 
 	private TaxiStatusDTO driverData = new TaxiStatusDTO();
+	private static int closeradius = 5;
+	private static int homecloseradius = 10;
+	private boolean isPaused =false;
 
 	@Override
 	protected void setup() {
@@ -41,7 +48,9 @@ public class TaxiDriverAgent extends Agent{
 		addBehaviour(new DriverStatisUpdates());
 
 	}
-
+	public boolean getisPaused() {
+		return this.isPaused;
+	}
 
 	class DriverStatisUpdates extends CyclicBehaviour{
 
@@ -54,21 +63,47 @@ public class TaxiDriverAgent extends Agent{
 			ACLMessage taxistatusMsg = receive(stausTemplate);
 
 
-			MessageTemplate availabilityTemplate = MessageTemplate.MatchConversationId("availability");
-			ACLMessage availabilityMsg = receive(availabilityTemplate);
+			//			MessageTemplate availabilityTemplate = MessageTemplate.MatchConversationId("availability");
+			//			ACLMessage availabilityMsg = receive(availabilityTemplate);
 
 
 			try {
 				if(taxistatusMsg !=null) {
-					//set is taxistatus
-				}
+
+
+					TaxiStatusDTO driverStatUpdate =(TaxiStatusDTO) taxistatusMsg.getContentObject();
+					var headdingchange = (driverData.getHeadingLat() != driverStatUpdate.getHeadingLat() || driverData.getHeadingLon() !=  driverStatUpdate.getHeadingLon());
+					if(headdingchange) {
+						driverData.setHeadingLat(driverStatUpdate.getHeadingLat());
+						driverData.setHeadingLon(driverStatUpdate.getHeadingLon());
+					}
+
+					var currentlocationchange = (driverData.getCurrentLat() != driverStatUpdate.getCurrentLat() || driverData.getCurrentLon() !=  driverStatUpdate.getCurrentLon());
+					if(currentlocationchange) {
+						driverData.setCurrentLat(driverStatUpdate.getCurrentLat());
+						driverData.setCurrentLon(driverStatUpdate.getCurrentLon());
+					}
+
+					var taxiStasuschange = (driverData.getTaxiStatus() != driverStatUpdate.getTaxiStatus());
+					if(taxiStasuschange) {
+						driverData.setTaxiStatus(driverStatUpdate.getTaxiStatus());
+						if(driverData.getTaxiStatus() == 0) {
+							isPaused =true;
+
+
+						}else if(driverData.getTaxiStatus() ==1) {
+							isPaused =false;
+							this.notify();
+						}
+					}
+					var serviceavailabilitychange = (driverData.getOnService() != driverStatUpdate.getOnService());
 
 
 
-				if(availabilityMsg != null) {
-					//consider 'onsiervice' var
-					// do delete
-				}
+
+
+				}else {block();}
+
 			}catch(Exception ex) {
 				ex.printStackTrace();
 			}
@@ -90,8 +125,34 @@ public class TaxiDriverAgent extends Agent{
 			try {
 
 				if(tripCallMsg !=null) {
+					TaxiRequestDTO taxiCall = (TaxiRequestDTO) tripCallMsg.getContentObject();
+					double distance = haversine(driverData.getCurrentLat(), driverData.getCurrentLon(), taxiCall.startLat, taxiCall.startLon);
+					if(distance <= closeradius) {
 
+						//A latitude of 0 and a longitude of 0 (0, 0) points to a location in the Gulf of Guinea, off the coast of West Africa, which is often considered "ocean" rather than land.
+						if(driverData.getHeadingLat() == 0 && driverData.getHeadingLon() == 0) {
+							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
+							msg.setConversationId("toJadetoSB");   
+							msg.setContent("DriverAboutMatch");
+							msg.setContentObject((Serializable) taxiCall); 
+							msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
+							send(msg);
+						}else {
+							double enddistance = haversine(driverData.getHeadingLat(), driverData.getHeadingLon(), taxiCall.destLat, taxiCall.destLon);
+							if(enddistance <= homecloseradius) {
+								ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
+
+								msg.setConversationId("toJadetoSB");   
+								msg.setContent("DriverAboutMatch");
+								msg.setContentObject((Serializable) taxiCall); 
+								msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
+								send(msg);
+
+							}
+						}
+
+					}
 				}
 
 			}
