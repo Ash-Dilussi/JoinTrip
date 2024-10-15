@@ -105,9 +105,9 @@ public class PassengerTCPListner extends Agent {
 				if(passenger.getIsScheduled() == 0) {
 					AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), PassengerAgent.class.getName(), args);
 					passengerAgent.start();
-				}else {
-					AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), SchedulPasngerAgent.class.getName(), args);
-					passengerAgent.start();
+				}else if(passenger.getIsScheduled() == 1){
+					AgentController schedulepassengerAgent = container.createNewAgent(passenger.getJoinReqId(), SchedulPasngerAgent.class.getName(), args);
+					schedulepassengerAgent.start();
 				}
 				//System.out.println("Created agent: " +passenger.getJoinReqId());
 			} catch (StaleProxyException e) {

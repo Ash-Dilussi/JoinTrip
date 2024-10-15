@@ -20,3 +20,10 @@ Cons:
 
 Overhead: There might be additional overhead compared to a direct TCP connection, especially if the interface translates messages between the two systems.
 Latency: Depending on the implementation, there could be some latency compared to a direct TCP listener.
+
+
+
+
+DISCUSSION:
+
+- time Zone management
