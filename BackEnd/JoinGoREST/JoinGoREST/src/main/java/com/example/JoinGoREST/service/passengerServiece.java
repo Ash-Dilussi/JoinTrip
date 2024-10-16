@@ -16,6 +16,7 @@ import com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO;
 import com.example.JoinGoREST.Model.Entity.JoinRequest;
 import com.example.JoinGoREST.Model.Entity.MasJoinList;
 import com.example.JoinGoREST.Model.Entity.Passenger;
+import com.example.JoinGoREST.controllers.WebSocketController;
 import com.example.JoinGoREST.repo.JoinRequestRepo;
 import com.example.JoinGoREST.repo.MasJoinListRepo;
 import com.example.JoinGoREST.repo.PassengerRepo;
@@ -32,7 +33,9 @@ public class passengerServiece implements Ipassenger {
 	@Autowired
 	private   PassengerRepo _passengerepo;
 	@Autowired
-	private MasJoinListRepo _maslistrepo;
+	private MasJoinListRepo _maslistrepo; 
+	@Autowired
+	private WebSocketController _webSocketController;
 
 	private final int TIMEOUT_MILLIS = 17000; // Total timeout duration (20 seconds)
 	private final int CHECK_INTERVAL = 4000; // Check every 5 seconds
@@ -151,8 +154,7 @@ public class passengerServiece implements Ipassenger {
 	}
 
 
-	@Override
-	//@Async
+	@Override 
 	public String joinPassengerInform(String jsonfromMAS) {
 		Gson gson = new Gson(); 
 		MasJoinList masmsg  = new MasJoinList(); 
