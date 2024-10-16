@@ -17,22 +17,14 @@ public class TaxiDriverAgent extends Agent{
 	private TaxiStatusDTO driverData = new TaxiStatusDTO();
 	private static int closeradius = 5;
 	private static int homecloseradius = 10;
-	private boolean isPaused =false;
+
 
 	@Override
 	protected void setup() {
 
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType("taxidriver");
-		sd.setName(getLocalName());
-		DFAgentDescription dfd = new DFAgentDescription();
-		dfd.setName(getAID());
-		dfd.addServices(sd);
-		try {
-			DFService.register(this, dfd);
-		} catch (FIPAException fe) {
-			fe.printStackTrace();
-		}
+
+		registerWithDF();
+
 
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
@@ -48,8 +40,20 @@ public class TaxiDriverAgent extends Agent{
 		addBehaviour(new DriverStatisUpdates());
 
 	}
-	public boolean getisPaused() {
-		return this.isPaused;
+
+	private void registerWithDF() {
+
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("taxidriver");
+		sd.setName(getLocalName());
+		DFAgentDescription dfd = new DFAgentDescription();
+		dfd.setName(getAID());
+		dfd.addServices(sd);
+		try {
+			DFService.register(this, dfd);
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
 	}
 
 	class DriverStatisUpdates extends CyclicBehaviour{
@@ -61,10 +65,6 @@ public class TaxiDriverAgent extends Agent{
 
 			MessageTemplate stausTemplate = MessageTemplate.MatchConversationId("taxistatus");
 			ACLMessage taxistatusMsg = receive(stausTemplate);
-
-
-			//			MessageTemplate availabilityTemplate = MessageTemplate.MatchConversationId("availability");
-			//			ACLMessage availabilityMsg = receive(availabilityTemplate);
 
 
 			try {
@@ -88,19 +88,23 @@ public class TaxiDriverAgent extends Agent{
 					if(taxiStasuschange) {
 						driverData.setTaxiStatus(driverStatUpdate.getTaxiStatus());
 						if(driverData.getTaxiStatus() == 0) {
-							isPaused =true;
 
+							DFService.deregister(myAgent);
 
 						}else if(driverData.getTaxiStatus() ==1) {
-							isPaused =false;
-							this.notify();
+							registerWithDF();
+							//this.notify();
 						}
 					}
 					var serviceavailabilitychange = (driverData.getOnService() != driverStatUpdate.getOnService());
+					if(serviceavailabilitychange) {
+						driverData.setOnService(driverStatUpdate.getOnService());
+						if(driverData.getOnService() == 0) {
+							System.out.println( " Terminating driver: " + getLocalName() );
 
-
-
-
+							doDelete();
+						}
+					}
 
 				}else {block();}
 
@@ -109,6 +113,8 @@ public class TaxiDriverAgent extends Agent{
 			}
 
 		}
+
+
 	}
 
 
