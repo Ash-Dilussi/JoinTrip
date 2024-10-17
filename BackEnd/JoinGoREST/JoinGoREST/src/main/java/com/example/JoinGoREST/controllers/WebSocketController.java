@@ -23,7 +23,7 @@ public class WebSocketController {
 	}
 
 	// Send notifications to passengers
-	public void sendNotificationToPassenger(Notification notification) {
+	public void sendNotificationToPassenger(JoinRequestDTO notification) {
 		messagingTemplate.convertAndSend("/topic/passenger/notifications", notification);
 	}
 
