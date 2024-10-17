@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE `SP_I_JoinRequest`(
+CREATE PROCEDURE `SP_I_JoinRequest`(
    IN p_joinReqId VARCHAR(255),
     IN p_pasName VARCHAR(255),
     IN p_desplace_id VARCHAR(255),
