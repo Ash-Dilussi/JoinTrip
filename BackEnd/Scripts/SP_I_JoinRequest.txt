@@ -1,17 +1,26 @@
-CREATE PROCEDURE `SP_I_JoinRequest`(
+USE `joingo`;
+DROP procedure IF EXISTS `SP_I_JoinRequest`;
+
+USE `joingo`;
+DROP procedure IF EXISTS `joingo`.`SP_I_JoinRequest`;
+;
+
+DELIMITER $$
+USE `joingo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_I_JoinRequest`(
    IN p_joinReqId VARCHAR(255),
-    IN p_pasName VARCHAR(255),
+    IN p_userId VARCHAR(255),
     IN p_desplace_id VARCHAR(255),
     IN p_startLon FLOAT,
     IN p_startLat FLOAT,
     IN p_destLon FLOAT,
-    IN p_destLat FLOAT,
-IN p_isScheduled INT,
-IN p_deleteTime DATETIME,
+    IN p_destLat FLOAT, 
 IN p_requestStatus INT,
-IN p_vehicletype INT
-
-
+IN p_vehicletype INT, 
+IN p_scheduleTime DATETIME,
+IN p_tripType INT,
+IN p_SegmentDistance INT
+ 
 )
 BEGIN
 DECLARE new_id VARCHAR(255);
@@ -22,7 +31,11 @@ update joinreq_sequence set next_val = next_val + 1  where next_val = new_id;
 SET SQL_SAFE_UPDATES = 1;
       
     -- SET new_id = (SELECT next_val from passenger_Sequence);
-INSERT INTO tbl_Join_Request (id,join_req_id, pas_name, desplace_id, start_lon, start_lat, dest_lon, dest_lat, is_scheduled, delete_time, request_status, vehicletype)
-    VALUES (new_id,p_joinReqId, p_pasName, p_desplace_id, p_startLon, p_startLat, p_destLon, p_destLat,p_isScheduled, p_deleteTime, p_requestStatus, p_vehicletype);
+INSERT INTO tbl_Join_Request (id,desplace_id, dest_lat, dest_lon, joinreqid, start_lat, start_lon, userid, req_vehicletype, request_status, segment_distance, schedule_time, trip_type)
+    VALUES (new_id,p_desplace_id,p_destLat,p_destLon,p_joinReqId,p_startLat,p_startLon,p_userId,p_vehicletype,p_requestStatus,p_SegmentDistance,p_scheduleTime,p_tripType);
 
-END
+END$$
+
+DELIMITER ;
+;
+

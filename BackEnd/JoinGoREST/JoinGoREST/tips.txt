@@ -1,5 +1,7 @@
 mvn spring-boot:run
 
+mvn clean install
+
 List<?> list;  // A list that can hold any type (wildcard)
 
 

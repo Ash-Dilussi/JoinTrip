@@ -1,5 +1,9 @@
 package DTO;
 import java.util.Date;
+import java.util.List;
+
+
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -10,14 +14,20 @@ public class JoinRequestDTO implements Serializable {
 	//private String pasName;
 	private String userId;
 	private String joinReqId;
-	private double startLon; // Use double for decimal values
-	private double startLat; // Use double for decimal values
-	private double destLon;  // Use double for decimal values
+	private double startLon; 
+	private double startLat; 
+	private double destLon;  
 	private double destLat;
 	private String desplace_id;
-	private int isScheduled = 0;
-	private String deleteTime = null; 
+	
+	private long scheduleTime ; 
 	private int isRequestDone =0;
+	
+	private int tripType=0;
+	private int SegmentDistance=0;
+	private RouteDTO longRoute;
+	private int userType;
+	
  
 
 	public String getJoinReqId() {
@@ -77,22 +87,18 @@ public class JoinRequestDTO implements Serializable {
 	}
 
 	public Date getDelelteTime() throws ParseException {
-		 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		 Date ScheduleTime = dateFormat.parse(deleteTime);
-		return ScheduleTime;
+	    //System.out.println("this is del time:"+scheduleTime);
+		 //SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy'T'HH:mm:ss");
+		// Date ScheduleTime = dateFormat.parse(scheduleTime);
+		 Date ScheduleTime = new Date(scheduleTime);
+		 return ScheduleTime;
 	}
 
-	public void setDelelteTime(String delelteTime) {
-		this.deleteTime = delelteTime;
+	public void setDelelteTime(long delelteTime) {
+		this.scheduleTime = delelteTime;
 	}
 
-	public int getIsScheduled() {
-		return isScheduled;
-	}
-
-	public void setIsScheduled(int isScheduled) {
-		this.isScheduled = isScheduled;
-	}
+ 
 
 	public int getIsRequestDone() {
 		return isRequestDone;
@@ -102,5 +108,49 @@ public class JoinRequestDTO implements Serializable {
 		this.isRequestDone = isRequestDone;
 	}
 
+	public int getTripType() {
+		return tripType;
+	}
+
+	public void setTripType(int tripType) {
+		this.tripType = tripType;
+	}
+
+	public int getSegmentDistance() {
+		return SegmentDistance;
+	}
+
+	public void setSegmentDistance(int segmentDistance) {
+		SegmentDistance = segmentDistance;
+	}
+
+	public RouteDTO getLongRoute() {
+		return longRoute;
+	}
+
+	public void setLongRoute(RouteDTO longRoute) {
+		this.longRoute = longRoute;
+	}
+
+	public int getUserType() {
+		return userType;
+	}
+
+	public void setUserType(int userType) {
+		this.userType = userType;
+	}
+
 
 }
+
+
+
+
+class Coordinate {
+    public double latitude;
+    public double longitude;
+    }
+
+class RouteDTO { 
+    public List<Coordinate> routeCoordinates; 
+    }

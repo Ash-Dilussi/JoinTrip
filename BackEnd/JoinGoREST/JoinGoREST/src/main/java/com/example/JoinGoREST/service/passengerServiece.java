@@ -37,8 +37,8 @@ public class passengerServiece implements Ipassenger {
 	@Autowired
 	private WebSocketController _webSocketController;
 
-	private final int TIMEOUT_MILLIS = 17000; // Total timeout duration (20 seconds)
-	private final int CHECK_INTERVAL = 4000; // Check every 5 seconds
+	private final int TIMEOUT_MILLIS = 17000; 
+	private final int CHECK_INTERVAL = 5000; // Check every x seconds
 
 
 
@@ -57,17 +57,35 @@ public class passengerServiece implements Ipassenger {
 		CompletableFuture<String> jointlsit=null;
 		try {
 			joinrequest.setJoinReqId(generatepasId(joinrequest.userId));
+			 System.out.println(joinrequest);
+			if(joinrequest.userType ==2 ) {
+				Passenger guestPassenger = new Passenger(
+						0,
+						joinrequest.userInfo.getUserid(),
+						joinrequest.userType,
+						joinrequest.userInfo.getFirstName(),
+						joinrequest.userInfo.getLastName(),
+						joinrequest.userInfo.getAddressline1(),
+						joinrequest.userInfo.getAddressline2(),
+						joinrequest.userInfo.getTown(),
+						joinrequest.userInfo.getEmail(),
+						joinrequest.userInfo.getGender(),
+						joinrequest.userInfo.getNic(),
+						joinrequest.userInfo.getPhone());
+				
+				this.createPassenger(guestPassenger);
+			}
+System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
+			_joinrequestrepo.insertPasReq(joinrequest.joinReqId, joinrequest.userId, joinrequest.desplace_id, joinrequest.startLon, joinrequest.startLat, joinrequest.destLon, joinrequest.destLat, joinrequest.requestStatus, joinrequest.reqVehicletype, joinrequest.getScheduleTimeinDate(), joinrequest.tripType, joinrequest.SegmentDistance);
 
-			_joinrequestrepo.insertPassenger(joinrequest.joinReqId, joinrequest.userId, joinrequest.desplace_id, joinrequest.startLon, joinrequest.startLat, joinrequest.destLon, joinrequest.destLat,joinrequest.isScheduled, joinrequest.deleteTime, joinrequest.requestStatus, joinrequest.reqVehicletype);
-
-			System.out.println("data saved");
+		
+			
 			jointlsit= this.notifyJadeMAS(joinrequest);
 
 		} catch (Exception e) { 
 			e.printStackTrace();
 		}
-		return jointlsit;
-		//return _passengerepo.save(passenger);
+		return jointlsit; 
 	}
 
 
@@ -79,7 +97,7 @@ public class passengerServiece implements Ipassenger {
 		return CompletableFuture.supplyAsync(() ->{
 			String response = null;
 			long startTime = System.currentTimeMillis();
-			try (Socket socket = new Socket("localhost", 8082);
+			try (Socket socket = new Socket("localhost", 8070);
 					PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 					//BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
 					) {
@@ -105,7 +123,7 @@ public class passengerServiece implements Ipassenger {
 
 								Passenger res = _passengerepo.getResponsePassforreqId(ajoin);
 
-								tempJoinList.add(new ResponsePassengerDTO(res.getUserid(),res.getUsername(),res.getPhone(),res.getTown()));
+								tempJoinList.add(new ResponsePassengerDTO(res.getUserid(),res.getFirstName(),res.getLastName(),res.getPhone(),res.getGender(),res.getTown()));
 
 							}
 

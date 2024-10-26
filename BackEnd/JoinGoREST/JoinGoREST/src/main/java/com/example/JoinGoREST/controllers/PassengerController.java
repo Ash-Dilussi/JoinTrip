@@ -1,5 +1,6 @@
 package com.example.JoinGoREST.controllers;
 
+import java.io.Console;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -56,11 +57,14 @@ public class PassengerController {
 
 	}
 
-	@GetMapping("/createJoinRequest")
-	public CompletableFuture<String> createJoinRequest(@RequestBody JoinRequestDTO joinrequest){
-		try {RestTemplate restTemplate = new RestTemplate();
+	@PostMapping("/createRideRequest")
+	public CompletableFuture<String> createRideRequest(@RequestBody JoinRequestDTO joinrequest){
+		try { 
  
+		System.out.println("hit to createRideRequest:   ");
 		return _passenger.createJoinRequest(joinrequest);
+		
+		
 		}
 		catch(Exception ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot create passenger"+ ex);
