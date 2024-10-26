@@ -1,6 +1,6 @@
 package com.example.JoinGoREST.repo;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,8 +16,8 @@ public interface JoinRequestRepo extends JpaRepository<JoinRequest , String>{
 	List<JoinRequest> getPassengerAll();
 
 	@Modifying
-	@Query(value = "CALL SP_I_JoinRequest(:joinReqId, :userId, :desplaceId, :startLon, :startLat, :destLon, :destLat, :isScheduled, :deleteTime,:requestStatus,:vehicletype)", nativeQuery = true)
-	void insertPassenger(String joinReqId, String userId, String desplaceId, float startLon, float startLat, float destLon, float destLat,int isScheduled, Date deleteTime, int requestStatus, int vehicletype);
+	@Query(value = "CALL SP_I_JoinRequest(:joinReqId, :userId, :desplaceId, :startLon, :startLat, :destLon, :destLat, :requestStatus,:vehicletype, :scheduleTime, :tripType, :SegmentDistance )", nativeQuery = true)
+	void insertPasReq(String joinReqId, String userId, String desplaceId, float startLon, float startLat, float destLon, float destLat, int requestStatus, int vehicletype, Date scheduleTime, int tripType, int SegmentDistance);
 
 
 }

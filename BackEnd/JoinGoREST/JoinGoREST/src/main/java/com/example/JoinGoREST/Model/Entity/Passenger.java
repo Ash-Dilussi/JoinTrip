@@ -38,18 +38,21 @@ public class Passenger {
 	@GeneratedValue(strategy=GenerationType.AUTO) 
 	private Integer Id;
 	private String Userid;
-	private String Username;
+	private Integer userType;
+	private String FirstName;
+	private String LastName;
 	private String Addressline1;
 	private String Addressline2;
 	private String Town;
-	private String Email;
+	private String Email="";
+	private char Gender;
 
-
+ 
 	@Column(nullable = false)
 	private String nic;
 
 	@Column(nullable = false)
-	private Integer Phone;
+	private String Phone;
 
 
 

@@ -1,6 +1,9 @@
 package com.example.JoinGoREST.Model.Entity;
 
 
+
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,11 +36,13 @@ public class JoinRequest {
 	private float startLat =0;
 	private float destLon =0;
 	private float destLat =0; 
-	private String deleteTime = null; 
+	
 	private int requestStatus;
 	private int reqVehicletype=0;
 
-
+	private Date scheduleTime;
+	private int tripType=0;
+	private int SegmentDistance=0; 
 
 
 

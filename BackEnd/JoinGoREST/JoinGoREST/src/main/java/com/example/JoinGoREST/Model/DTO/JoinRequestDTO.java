@@ -1,6 +1,10 @@
 package com.example.JoinGoREST.Model.DTO;
 
-import java.sql.Date;
+
+import java.util.Date;
+import java.util.List;
+
+import com.example.JoinGoREST.Model.Entity.Passenger;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,9 +24,38 @@ public class JoinRequestDTO {
 	public float startLat =0;
 	public float destLon =0;
 	public float destLat =0;
-	public int isScheduled = 0;
-	public Date deleteTime = null; 
+	 
+	 
 	public int requestStatus =0;
 	public int reqVehicletype=0;
+	
+	public long scheduleTime;
+	public int tripType=0;
+	public int SegmentDistance=0;
+	public RouteDTO longRoute;
+	public int userType;
+	
+	public Passenger userInfo ;
+	
+	public  Date getScheduleTimeinDate() {
+		return new Date(scheduleTime);
+	}
 
 }
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+ class Coordinate {
+    public double latitude;
+    public double longitude;
+    }
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class RouteDTO { 
+    public List<Coordinate> routeCoordinates; 
+    }

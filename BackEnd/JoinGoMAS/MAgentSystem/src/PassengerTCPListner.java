@@ -38,7 +38,7 @@ public class PassengerTCPListner extends Agent {
 
 		// new thread to listen for incoming calls
 		new Thread(() -> {
-			try (ServerSocket serverSocket = new ServerSocket(8082)) {
+			try (ServerSocket serverSocket = new ServerSocket(8070)) {
 
 
 				while (true) {
@@ -57,8 +57,7 @@ public class PassengerTCPListner extends Agent {
 						}
 						//System.out.println("Received registration to tcp: " + message);
 
-					}
-					// Close the socket
+					} 
 					socket.close();
 				}
 			} catch (Exception e) {
@@ -102,10 +101,10 @@ public class PassengerTCPListner extends Agent {
 				AgentContainer container = getContainerController();
 
 				Object[] args = new Object[] { passenger };
-				if(passenger.getIsScheduled() == 0) {
+				if(passenger.getTripType() == 2) {
 					AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), PassengerAgent.class.getName(), args);
 					passengerAgent.start();
-				}else if(passenger.getIsScheduled() == 1){
+				}else if(passenger.getTripType() == 4){
 					AgentController schedulepassengerAgent = container.createNewAgent(passenger.getJoinReqId(), SchedulPasngerAgent.class.getName(), args);
 					schedulepassengerAgent.start();
 				}

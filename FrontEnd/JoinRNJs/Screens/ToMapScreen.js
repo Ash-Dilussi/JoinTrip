@@ -4,12 +4,12 @@ import { FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View
 import tw from 'twrnc';
 import Map from '../Components/Map';
 import MapNavigationCard from '../Components/MapNavigationCard';
-import MapView from 'react-native-maps';
+import ScheduleTimeCard from '../Components/ScheduleTimeCard'; 
 import SelectOptionCard from '../Components/SelectOptionCard';
 import { createStackNavigator } from '@react-navigation/stack';
 
 
-const MapScreen = () => {
+const ToMapScreen = () => {
 
   const Stack= createStackNavigator();
   return (
@@ -32,6 +32,13 @@ const MapScreen = () => {
             }}
           />
           <Stack.Screen
+            name="ScheduleTimeCard"
+            component={ScheduleTimeCard}
+            options={{
+              headerShown: false,
+            }}
+          /> 
+          <Stack.Screen
             name="SelectOptionCard"
             component={SelectOptionCard}
             options={{
@@ -49,8 +56,6 @@ const MapScreen = () => {
 }
 
 
-export default MapScreen
+export default ToMapScreen
 
-const styles = StyleSheet.create({
-
-})
+ 

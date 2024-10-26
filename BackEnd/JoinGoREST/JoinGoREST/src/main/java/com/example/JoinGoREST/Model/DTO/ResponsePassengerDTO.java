@@ -6,13 +6,14 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-
+@NoArgsConstructor 
 public class ResponsePassengerDTO{
 
 	public String userid; 
-	public String username;
-	public Integer phone;
+	public String firstName;
+	public String lastName;
+	public String phone;
+	public char gender;
 	public String town;
 
 }
