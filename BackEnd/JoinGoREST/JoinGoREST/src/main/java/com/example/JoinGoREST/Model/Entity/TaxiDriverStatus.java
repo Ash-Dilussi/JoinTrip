@@ -25,9 +25,12 @@ public class TaxiDriverStatus{
 	private float currentLon=0;
 	private float currentLat=0;
 	private float headingLat=0;
-	private float headingLon=0;
+	private float headingLon=0; 
 	private int vehicletype;
 	private int taxiStatus;
 	private int onService=1;
+	
+	private String phone;
+	private String nic;
 
 }

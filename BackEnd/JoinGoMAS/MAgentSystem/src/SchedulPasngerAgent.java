@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import DTO.JoinRequestDTO;
-import DTO.returnPasstoSBDTO;
+import DTO.ResJoinMachListDTO;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -93,34 +93,7 @@ public class SchedulPasngerAgent extends Agent {
 
 
 
-	class FindTaxiBehaviour extends OneShotBehaviour {
-
-
-		@Override
-		public void action() {
-			DFAgentDescription template = new DFAgentDescription();
-			ServiceDescription sd = new ServiceDescription();
-			sd.setType("taxi");
-			template.addServices(sd);
-			try {
-				System.out.println(getAgent().getLocalName() + ": Searching for available taxis...");
-				DFAgentDescription[] result = DFService.search(this.getAgent(), template);
-				if (result.length > 0) {
-					for (DFAgentDescription dfAgent : result) {
-						ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-						msg.addReceiver(dfAgent.getName());
-						msg.setContent("Need a ride!");
-						send(msg);
-
-					}
-				}
-			} catch (FIPAException fe) {
-				fe.printStackTrace();
-			}
-
-
-		}
-	}
+	 
 
 	class firstnewreqplaceidone extends OneShotBehaviour{
 
@@ -129,7 +102,7 @@ public class SchedulPasngerAgent extends Agent {
 
 			DFAgentDescription template = new DFAgentDescription();
 			ServiceDescription sdnew = new ServiceDescription();
-			sdnew.setType("passenger");
+			sdnew.setType("schedulepassenger");
 			template.addServices(sdnew);
 
 			try {
@@ -165,7 +138,7 @@ public class SchedulPasngerAgent extends Agent {
 
 			DFAgentDescription template = new DFAgentDescription();
 			ServiceDescription sdnew = new ServiceDescription();
-			sdnew.setType("passenger");
+			sdnew.setType("schedulepassenger");
 			template.addServices(sdnew);
 
 			try {
@@ -231,7 +204,7 @@ public class SchedulPasngerAgent extends Agent {
 
 					ACLMessage msgtoSB = new ACLMessage(ACLMessage.REQUEST);  
 
-					returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
+					ResJoinMachListDTO listToSB = new ResJoinMachListDTO();
 					listToSB.setCurrentPassenger(passengerData);
 					listToSB.setJoinPassengerList(joinCompaitbleList);
 					msgtoSB.setConversationId("passtoSBJoin");   
@@ -341,7 +314,7 @@ public class SchedulPasngerAgent extends Agent {
 						try { 
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-							returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
+							ResJoinMachListDTO listToSB = new ResJoinMachListDTO();
 							listToSB.setCurrentPassenger(passengerData);
 							listToSB.setJoinPassengerList(joinCompaitbleList);
 							msg.setConversationId("passtoSBJoin");   

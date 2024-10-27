@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import DTO.JoinRequestDTO;
-import DTO.returnPasstoSBDTO;
+import DTO.ResJoinMachListDTO;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -202,10 +202,12 @@ public class PassengerAgent extends Agent {
 
 						ACLMessage msgtoSB = new ACLMessage(ACLMessage.REQUEST);  
 
-						returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
+						ResJoinMachListDTO listToSB = new ResJoinMachListDTO();
 						listToSB.setCurrentPassenger(passengerData);
 						listToSB.setJoinPassengerList(joinCompaitbleList);
-						msgtoSB.setConversationId("passtoSBJoin");   
+						
+						msgtoSB.setConversationId("fromPassengerJoinList"); 
+						//msgtoSB.setContent("passengerAboutJoint");
 						msgtoSB.setContentObject((Serializable) listToSB); 
 						msgtoSB.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
 						send(msgtoSB);
@@ -250,35 +252,7 @@ public class PassengerAgent extends Agent {
 				response.setContent(mypalceId);
 				send(response);
 
-				//				DFAgentDescription template = new DFAgentDescription();
-				//				ServiceDescription sd = new ServiceDescription();
-				//				sd.setType("passenger");
-				//				template.addServices(sd);
-				//				try { 
-				//					//String mypalceId = passengerData.getDesplace_id();
-				//					DFAgentDescription[] result = DFService.search(this.getAgent(), template);
-				//					if (result.length > 0) {
-				//						for (DFAgentDescription dfAgent : result) {
-				//							 
-				//							if( !messagedAgents.contains(dfAgent.getName().getLocalName()) ) {  
-				//								
-				//						    System.out.println("Broadcast From: "+ getLocalName());
-				//							ACLMessage msgbrdcast = new ACLMessage(ACLMessage.REQUEST);  
-				//							msgbrdcast.addReceiver(dfAgent.getName());
-				//							msgbrdcast.setConversationId("placeId"); 
-				//							msgbrdcast.setContent(mypalceId);
-				//					
-				//							send(msgbrdcast);
-				//							
-				//							}
-				//							  
-				//						}
-				//					}
-				//				} catch (FIPAException fe) {
-				//					fe.printStackTrace(); 
-				//
-				//
-				//				}
+
 
 			}else {
 				block();
@@ -345,11 +319,11 @@ public class PassengerAgent extends Agent {
 						try { 
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-							returnPasstoSBDTO listToSB = new returnPasstoSBDTO();
+							ResJoinMachListDTO listToSB = new ResJoinMachListDTO();
 							listToSB.setCurrentPassenger(passengerData);
 							listToSB.setJoinPassengerList(joinCompaitbleList);
-							msg.setConversationId("toJadetoSB");   
-							msg.setContent("passengerAboutJoint");
+							
+							msg.setConversationId("fromPassengerJoinList");   
 							msg.setContentObject((Serializable) listToSB); 
 							msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
 							send(msg);

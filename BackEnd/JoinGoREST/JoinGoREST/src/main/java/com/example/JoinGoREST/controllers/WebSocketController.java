@@ -5,6 +5,7 @@ import javax.management.Notification;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import com.example.JoinGoREST.Model.DTO.DriverMatchResMAS;
 import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
 import com.example.JoinGoREST.Model.Entity.TaxiRequest;
 
@@ -28,7 +29,7 @@ public class WebSocketController {
 	}
 
 	// Send updates to drivers
-	public void sendUpdateToDriver(TaxiRequest update) {
+	public void sendTripToDriver(DriverMatchResMAS update) {
 		messagingTemplate.convertAndSend("/topic/driver/updates", update);
 	}
 

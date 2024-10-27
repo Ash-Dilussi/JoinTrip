@@ -2,6 +2,10 @@ mvn spring-boot:run
 
 mvn clean install
 
+npx expo start
+
+
+
 List<?> list;  // A list that can hold any type (wildcard)
 
 

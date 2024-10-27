@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import tw from "twrnc";
 import { Icon } from "react-native-elements";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { API_BASE_URL } from "@env";
 import {
@@ -20,10 +20,12 @@ import {
   selectRideType,
   selectScheduleTime,
   selectUserType,
-  selectUserInfo
+  selectUserInfo,
+  clearJoinList,
+  addJoinList
 } from "../slices/navSlice";
 
-const SelectOptionCard = () => {
+const SelectOptionCard = ({ navigation }) => {
   const origin = useSelector(selectOrigin);
   const destination = useSelector(selectDestination);
   const farRoute = useSelector(selectFarRoute);
@@ -31,6 +33,9 @@ const SelectOptionCard = () => {
   const scheduleTime = useSelector(selectScheduleTime);
   const userType = useSelector(selectUserType);
   const userInfo = useSelector(selectUserInfo);
+
+
+  const dispatch = useDispatch(); 
 
   const vehicleType = 0;
   const SegmentDistanceKm = 10;
@@ -45,16 +50,19 @@ const SelectOptionCard = () => {
       const destinationName = destination.description;
       const apiridetype = rideType.ridetype;
       var scheduletime = apiridetype == 4 ? scheduleTime?.datetime : null;
-      var routeCoordinates = apiridetype == 3 ? farRoute.route : null;
+      var routeCoordinates = apiridetype == 3 ? farRoute.route : null; 
       const usertype = userType.type;
-      const userinfo = usertype == 2 ? userInfo: null;
+      const userinfo = usertype == 2 ? userInfo.primaryUserInfo : null;
 
       const randomFourDigitNumber = Math.floor(1000 + Math.random() * 9000);
       const randomUser = "userTest"+randomFourDigitNumber;
       const useridapi = usertype == 2 ? userInfo.userid: randomUser ;
 
       //console.log(`${API_BASE_URL}/passenger/createRideRequest`);
-      console.log("long rout:  ",userinfo);
+      console.log("userinfo:  ",userinfo);
+      //console.log("long rout:  ",routeCoordinates);
+
+      
       const response = await axios.post(
         `${API_BASE_URL}/passenger/createRideRequest`,
         {
@@ -73,7 +81,38 @@ const SelectOptionCard = () => {
           userInfo: userinfo
         }
       );
-      console.log("Route sent to backend:", response.data);
+     
+      dispatch(clearJoinList());
+      clearJoinList
+
+      if (response.data) {
+        console.log("Got a Response:", response.data);
+        
+       if(apiridetype == 2 ){
+       
+        const itemsArray = response.data.joinList; 
+        if(itemsArray){
+          itemsArray.forEach((item) => {
+          dispatch(addJoinList(item)); 
+        })}
+        
+      
+      navigation.navigate("JoinListScreen");
+   
+       }else if(apiridetype == 3){
+
+        const itemsArray = response.data.farRouteSegs; 
+        console.log(itemsArray);
+
+       }else if(apiridetype == 4){
+
+       }
+ 
+
+      } else {
+        console.log("Ride request unsuccessful:", response.data.message);
+        // Optional handling for specific cases in the response
+      }
     } catch (error) {
       console.error("Error sending route to backend:", error);
     }

@@ -2,7 +2,9 @@ package DTO;
 import java.util.ArrayList;
 import java.util.List;
 
-public class returnPasstoSBDTO {
+import jade.util.leap.Serializable;
+
+public class ResJoinMachListDTO implements Serializable {
 
 
 	private JoinRequestDTO currentPassenger;

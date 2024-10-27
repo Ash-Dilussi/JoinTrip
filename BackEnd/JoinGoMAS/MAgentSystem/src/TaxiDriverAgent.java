@@ -1,10 +1,14 @@
 import java.io.Serializable;
+import java.sql.DriverManager;
 
+import DTO.ResDriverMatch;
 import DTO.TaxiRequestDTO;
 import DTO.TaxiStatusDTO;
+import DTO.longrouteSegmentDTO;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -54,8 +58,51 @@ public class TaxiDriverAgent extends Agent{
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		
+		addBehaviour(new newTaxiAvailableBroadcase());
+		
 	}
 
+	
+	class newTaxiAvailableBroadcase extends OneShotBehaviour{
+		
+		
+		@Override
+		public void action() {
+			
+			final String[] passTypes = {"longtrippassenger"};
+			
+			for(String pasnger:passTypes) {
+				
+				
+				DFAgentDescription template = new DFAgentDescription();
+				ServiceDescription fromDriver = new ServiceDescription();
+				fromDriver.setType(pasnger);
+				template.addServices(fromDriver);
+				
+				try {
+					DFAgentDescription[] result = DFService.search(this.getAgent(), template);
+					if (result.length > 0) {
+						for (DFAgentDescription dfAgent : result) {
+	 
+					  
+								ACLMessage msgnewalert = new ACLMessage(ACLMessage.REQUEST); 
+								msgnewalert.addReceiver(dfAgent.getName());
+								msgnewalert.setConversationId("newTaxiAvailable");  
+								msgnewalert.setContent("newTaxiHere"); 
+ 
+								send(msgnewalert);
+	  
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+  
+			}
+			 
+		}
+	}
 	class DriverStatisUpdates extends CyclicBehaviour{
 
 		@Override
@@ -133,15 +180,20 @@ public class TaxiDriverAgent extends Agent{
 				if(tripCallMsg !=null) {
 					TaxiRequestDTO taxiCall = (TaxiRequestDTO) tripCallMsg.getContentObject();
 					double distance = haversine(driverData.getCurrentLat(), driverData.getCurrentLon(), taxiCall.startLat, taxiCall.startLon);
-					if(distance <= closeradius) {
+					if(distance <= closeradius && taxiCall.vehicletype == driverData.getVehicletype()) {
 
 						//A latitude of 0 and a longitude of 0 (0, 0) points to a location in the Gulf of Guinea, off the coast of West Africa, which is often considered "ocean" rather than land.
 						if(driverData.getHeadingLat() == 0 && driverData.getHeadingLon() == 0) {
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-							msg.setConversationId("toJadetoSB");   
+							msg.setConversationId("fromJadetoSB");   
 							msg.setContent("DriverAboutMatch");
-							msg.setContentObject((Serializable) taxiCall); 
+							
+							ResDriverMatch driveMatchList = new ResDriverMatch();
+							driveMatchList.setTaxiStatust(driverData);
+							driveMatchList.setTaxiRequest(taxiCall);
+							
+							msg.setContentObject((Serializable) driveMatchList); 
 							msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
 							send(msg);
 						}else {
@@ -149,9 +201,14 @@ public class TaxiDriverAgent extends Agent{
 							if(enddistance <= homecloseradius) {
 								ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-								msg.setConversationId("toJadetoSB");   
+								msg.setConversationId("fromJadetoSB");   
 								msg.setContent("DriverAboutMatch");
-								msg.setContentObject((Serializable) taxiCall); 
+								
+								ResDriverMatch driveMatchList = new ResDriverMatch();
+								driveMatchList.setTaxiStatust(driverData);
+								driveMatchList.setTaxiRequest(taxiCall);
+								
+								msg.setContentObject((Serializable) driveMatchList); 
 								msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
 								send(msg);
 

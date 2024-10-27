@@ -13,11 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
 import com.example.JoinGoREST.Model.DTO.JoinResponseListDTO;
 import com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO;
+import com.example.JoinGoREST.Model.DTO.ResponsetoFrontDTO;
 import com.example.JoinGoREST.Model.Entity.JoinRequest;
+import com.example.JoinGoREST.Model.Entity.LongDistanceSegment;
 import com.example.JoinGoREST.Model.Entity.MasJoinList;
 import com.example.JoinGoREST.Model.Entity.Passenger;
 import com.example.JoinGoREST.controllers.WebSocketController;
 import com.example.JoinGoREST.repo.JoinRequestRepo;
+import com.example.JoinGoREST.repo.LongDistanceSegmentsRepo;
 import com.example.JoinGoREST.repo.MasJoinListRepo;
 import com.example.JoinGoREST.repo.PassengerRepo;
 import com.google.gson.Gson;
@@ -35,10 +38,12 @@ public class passengerServiece implements Ipassenger {
 	@Autowired
 	private MasJoinListRepo _maslistrepo; 
 	@Autowired
+	private LongDistanceSegmentsRepo _longSegrepo;
+	@Autowired
 	private WebSocketController _webSocketController;
 
-	private final int TIMEOUT_MILLIS = 17000; 
-	private final int CHECK_INTERVAL = 5000; // Check every x seconds
+	private final int TIMEOUT_MILLIS = 19000; 
+	private final int CHECK_INTERVAL = 6000; // Check every x seconds
 
 
 
@@ -53,27 +58,35 @@ public class passengerServiece implements Ipassenger {
 
 	@Override
 	@Transactional
-	public CompletableFuture<String> createJoinRequest(JoinRequestDTO joinrequest) {
-		CompletableFuture<String> jointlsit=null;
+	public CompletableFuture<ResponsetoFrontDTO> createJoinRequest(JoinRequestDTO joinrequest) {
+		CompletableFuture<ResponsetoFrontDTO> jointlsit=null;
 		try {
 			joinrequest.setJoinReqId(generatepasId(joinrequest.userId));
 			 System.out.println(joinrequest);
 			if(joinrequest.userType ==2 ) {
-				Passenger guestPassenger = new Passenger(
-						0,
-						joinrequest.userInfo.getUserid(),
-						joinrequest.userType,
-						joinrequest.userInfo.getFirstName(),
-						joinrequest.userInfo.getLastName(),
-						joinrequest.userInfo.getAddressline1(),
-						joinrequest.userInfo.getAddressline2(),
-						joinrequest.userInfo.getTown(),
-						joinrequest.userInfo.getEmail(),
-						joinrequest.userInfo.getGender(),
-						joinrequest.userInfo.getNic(),
-						joinrequest.userInfo.getPhone());
 				
-				this.createPassenger(guestPassenger);
+				if(_passengerepo.getPassengerbyUserid(joinrequest.userInfo.getUserid()) == null) {
+					
+					
+					Passenger guestPassenger = new Passenger(
+							0,
+							joinrequest.userInfo.getUserid(),
+							joinrequest.userType,
+							joinrequest.userInfo.getFirstName(),
+							joinrequest.userInfo.getLastName(),
+							joinrequest.userInfo.getAddressline1(),
+							joinrequest.userInfo.getAddressline2(),
+							joinrequest.userInfo.getTown(),
+							joinrequest.userInfo.getEmail(),
+							joinrequest.userInfo.getGender(),
+							joinrequest.userInfo.getNic(),
+							joinrequest.userInfo.getPhone());
+					
+					this.createPassenger(guestPassenger);
+					
+				}
+				
+				 
 			}
 System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 			_joinrequestrepo.insertPasReq(joinrequest.joinReqId, joinrequest.userId, joinrequest.desplace_id, joinrequest.startLon, joinrequest.startLat, joinrequest.destLon, joinrequest.destLat, joinrequest.requestStatus, joinrequest.reqVehicletype, joinrequest.getScheduleTimeinDate(), joinrequest.tripType, joinrequest.SegmentDistance);
@@ -89,13 +102,13 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 	}
 
 
-	private CompletableFuture<String> notifyJadeMAS(JoinRequestDTO registration) throws Exception {
+	private CompletableFuture<ResponsetoFrontDTO> notifyJadeMAS(JoinRequestDTO registration) throws Exception {
 
 
 
 		JoinRequestDTO askingUser = registration;
 		return CompletableFuture.supplyAsync(() ->{
-			String response = null;
+			ResponsetoFrontDTO response = new ResponsetoFrontDTO();
 			long startTime = System.currentTimeMillis();
 			try (Socket socket = new Socket("localhost", 8070);
 					PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -108,13 +121,21 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 
 				out.println(jsonMessage); 
 
-
-				while (response == null) {
+				List<MasJoinList> joindbresponse = new ArrayList<>();
+				List<LongDistanceSegment> longdistanceresponse = new ArrayList<>();
+				while (response.getJoinList() == null || response.getJoinList().isEmpty()) {
 
 					//if ((System.currentTimeMillis() - startTime)% CHECK_INTERVAL  == 0) {
-
-					List<MasJoinList> joindbresponse = _maslistrepo.matchcall(askingUser.joinReqId);
-
+					if(registration.tripType == 2) {
+						
+					joindbresponse = _maslistrepo.matchcall(askingUser.joinReqId);
+					
+					}else if(registration.tripType == 3) {
+						
+						longdistanceresponse = _longSegrepo.getsegsbyTripid(askingUser.joinReqId);
+					}
+					
+					
 					if(!joindbresponse.isEmpty()) {// && joindbresponse.getAskingReqid().equals(re)
 						List<ResponsePassengerDTO> tempJoinList = new ArrayList<>();
 
@@ -128,8 +149,12 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 							}
 
 						}
-						response = "got a match "+ registration.joinReqId+ "  ::-> "+tempJoinList;
+						response.setJoinList(tempJoinList);
 						System.out.println("Received from MAS: " +CHECK_INTERVAL+ response);
+					}
+					
+					if(!longdistanceresponse.isEmpty()) {
+						response.setFarRouteSegs(longdistanceresponse);
 					}
 
 					//}
@@ -137,12 +162,15 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 					//				     
 					if (System.currentTimeMillis() - startTime > TIMEOUT_MILLIS) {
 						System.out.println("Timeout waiting for response from MAS.");
-						response ="Timeout waiting for response from MAS."; // Exit the loop if timeout occurs
+						return  response ;
+						//response ="Timeout waiting for response from MAS."; // Exit the loop if timeout occurs
 					}
 
 					// Sleep for the specified check interval
+					
 					Thread.sleep(CHECK_INTERVAL);
 				}
+				
 
 
 			}catch (Exception e) {
@@ -158,7 +186,7 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 			// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 			String formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
 
-			return formattedTime +" ::> "+ response ;
+			return  response ;
 		});
 
 
@@ -205,6 +233,40 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 
 		_maslistrepo.save(msg);
 
+	}
+
+
+//	@Override
+//	public String farRouteSaveInform(String farRouteSegDataMas) {
+//
+//		
+//		Gson gson = new Gson(); 
+//		  
+//		List<LongDistanceSegment> FarSegmentData = gson.fromJson(farRouteSegDataMas, LongDistanceSegment.class);
+//		 
+//
+//		System.out.println("Entering to saving the segments");
+//		farRouteSave(FarSegmentData);
+//		return "Received";
+//		 
+//	}
+//	
+	
+	@Override
+	@Transactional
+	public String farRouteSave(List<LongDistanceSegment> farRouteSegData) {
+
+		for(LongDistanceSegment item: farRouteSegData) {
+		_longSegrepo.save(item);
+		}
+		return "Segments revied";
+	}
+
+
+	@Override
+	public String farRouteSaveInform(LongDistanceSegment farRouteSegData) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

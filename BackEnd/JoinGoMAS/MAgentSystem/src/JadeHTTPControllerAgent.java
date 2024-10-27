@@ -38,7 +38,7 @@ public class JadeHTTPControllerAgent extends Agent{
 			public void action() {
 				ACLMessage msg = receive();
 				if (msg != null) {
-					System.out.println("Message received from another JADE agent: " + msg.getContent());
+					System.out.println("Message received SB: " + msg.getContent());
 				} else {
 					block();
 				}
@@ -53,9 +53,9 @@ public class JadeHTTPControllerAgent extends Agent{
 			//  multiple contexts
 			server.createContext("/taxiRequest", new taxiRequestHandler());
 			server.createContext("/taxiStatusUpdate", new taxiStatusUpdateHandler());
-			//server.createContext("/taxiMatchReply", new jsutgetHandler());
+		
 
-			server.setExecutor(null); // creates a default executor
+			server.setExecutor(null); // default executor
 			server.start();
 			System.out.println("HTTP Server started on port " + PORT);
 		} catch (IOException e) {
@@ -92,8 +92,8 @@ public class JadeHTTPControllerAgent extends Agent{
 
 					}else{
 						AgentContainer container = getContainerController();
-						AgentController schedulepassengerAgent = container.createNewAgent(driver.getDriverid(), TaxiDriverAgent.class.getName(), args);
-						schedulepassengerAgent.start();
+						AgentController TaxiDriver = container.createNewAgent(driver.getDriverid(), TaxiDriverAgent.class.getName(), args);
+						TaxiDriver.start();
 					}
 
 				} catch(Exception ex) {ex.printStackTrace();}

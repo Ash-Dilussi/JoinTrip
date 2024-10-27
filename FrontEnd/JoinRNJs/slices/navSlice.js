@@ -8,7 +8,8 @@ const initialState= {
     rideType: null,
     scheduleTime: null,
     userType: 0,
-    userInfo: null
+    userInfo: null,
+    joinList: [],
 }
 
 export const navSlice = createSlice({
@@ -39,11 +40,16 @@ export const navSlice = createSlice({
         setUserInfo:(state,action)=>{
             state.userInfo = action.payload;
         },
-
+        addJoinList: (state, action) => {
+            state.joinList.push(action.payload); 
+        },
+        clearJoinList: (state) => {
+            state.joinList = []; 
+        },
     },
 });
 
-export const {setOrigin, setDestination, setTravelTimeInformation, setFarRoute, setRideType, setScheduleTime, setUserType, setUserInfo}= navSlice.actions;
+export const {setOrigin, setDestination, setTravelTimeInformation, setFarRoute, setRideType, setScheduleTime, setUserType, setUserInfo, addJoinList, clearJoinList}= navSlice.actions;
 
 //selectors: import data from the global states
 export const selectOrigin = (state) => state.nav.origin;
@@ -54,6 +60,7 @@ export const selectRideType = (state) => state.nav.rideType;
 export const selectScheduleTime = (state) => state.nav.scheduleTime;
 export const selectUserType = (state) => state.nav.userType;
 export const selectUserInfo = (state) => state.nav.userInfo;
+export const selectJoinList = (state) => state.nav.joinList;
 
 
 export default navSlice.reducer;

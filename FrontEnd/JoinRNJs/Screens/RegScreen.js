@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { Alert, View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Using Ionicons for radio button icons
 import tw from 'twrnc';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,9 +27,12 @@ const RegScreen = ({ navigation }) => {
   
     const userid = lastName + middleFourDigits;
 
-    
-dispatch(setUserInfo({
-  id: 0,
+    if (!NIC || !phoneNumber || !lastName|| !homeTown) {
+      Alert.alert("Please Fill Essential Fields.");
+      return;
+    }
+    const primaryUser={
+id: 0,
   userid: userid,
   firstName:firstName,
   lastName:lastName,
@@ -39,6 +42,9 @@ dispatch(setUserInfo({
   gender:gender,
   nic:NIC,
   phone:phoneNumber
+    }
+dispatch(setUserInfo({
+  primaryUserInfo: primaryUser
 }))
 
     console.log('Registering user with details:', {

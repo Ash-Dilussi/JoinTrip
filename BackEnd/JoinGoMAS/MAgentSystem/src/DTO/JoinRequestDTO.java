@@ -25,7 +25,7 @@ public class JoinRequestDTO implements Serializable {
 	
 	private int tripType=0;
 	private int SegmentDistance=0;
-	private RouteDTO longRoute;
+	private List<Coordinate> longRoute;
 	private int userType;
 	
  
@@ -124,11 +124,11 @@ public class JoinRequestDTO implements Serializable {
 		SegmentDistance = segmentDistance;
 	}
 
-	public RouteDTO getLongRoute() {
+	public List<Coordinate> getLongRoute() {
 		return longRoute;
 	}
 
-	public void setLongRoute(RouteDTO longRoute) {
+	public void setLongRoute(List<Coordinate> longRoute) {
 		this.longRoute = longRoute;
 	}
 
@@ -146,11 +146,5 @@ public class JoinRequestDTO implements Serializable {
 
 
 
-class Coordinate {
-    public double latitude;
-    public double longitude;
-    }
 
-class RouteDTO { 
-    public List<Coordinate> routeCoordinates; 
-    }
+

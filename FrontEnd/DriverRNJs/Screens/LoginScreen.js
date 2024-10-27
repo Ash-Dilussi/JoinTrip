@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
 import tw from "twrnc";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserType } from "../slices/navSlice";
+import { setUserType } from "../Slices/navSlice";
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -12,21 +12,13 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = () => {
     // Handle login logic here
-    dispatch(
-      setUserType({
-        type: 1,
-      })
-    );
+   
     console.log("Logging in with", username, password);
   };
 
   const handleGuestLogin = () => {
    
-    dispatch(
-      setUserType({
-        type: 2,
-      })
-    );
+    
     navigation.navigate("RegScreen");
     console.log("User type as guest");
   };
@@ -38,7 +30,7 @@ const LoginScreen = ({ navigation }) => {
         style={tw`w-40 h-40`}
         resizeMode="contain"
       />
-      <Text style={tw`text-lg text-gray-500 mt-4 mb-5`}>Welcome to JoinGo!!</Text>
+      <Text style={tw`text-lg text-gray-500 mt-4 mb-5`}>Lets Ride JoinGo Driver!!</Text>
 
       <TextInput
         style={tw`border border-gray-300 rounded-lg px-4 py-2 mb-4 w-80`}

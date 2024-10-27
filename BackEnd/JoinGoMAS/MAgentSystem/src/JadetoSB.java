@@ -5,10 +5,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import com.google.gson.Gson;
 
-import DTO.returnPasstoSBDTO;
+import DTO.ResJoinMachListDTO;
+import DTO.longrouteSegmentDTO;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -40,46 +42,71 @@ public class JadetoSB extends Agent {
 
 	class WaitformsgBehaviour extends CyclicBehaviour {
 		private final Gson gson = new Gson();
+		private final String BASE_API_URL = "http://localhost:8080/api/v1";
 
 		@Override
 		public void action() {
 
-			MessageTemplate passtoSBJoinTemplate = MessageTemplate.MatchConversationId("toJadetoSB");
-			ACLMessage passtoSBJoinmsg = receive(passtoSBJoinTemplate);
+			
+			
+			MessageTemplate fromPassengerJoinListTemplate = MessageTemplate.MatchConversationId("fromPassengerJoinList");
+			ACLMessage fromPassengerJoinListmsg = receive(fromPassengerJoinListTemplate);
 
-			//System.out.println(getAgent().getLocalName() + ": Waiting for msg to send..."); 
+			MessageTemplate fromPassengerFarRouteTemplate = MessageTemplate.MatchConversationId("fromPassengerLongroutSegs");
+			ACLMessage fromPassengerFarRoutemsg = receive(fromPassengerFarRouteTemplate);
+ 
 
+			if (fromPassengerJoinListmsg != null) {
 
-			if (passtoSBJoinmsg != null) {
+			//	System.out.println("Message content: '" + fromPassengerJoinListmsg.getContent() + "'");
 
 				try {
-					String reddUrl = "";
-
-					if(passtoSBJoinmsg.getContent().equals("passengerAboutJoint")) { 
-						reddUrl = "http://localhost:8080/api/v1/passenger/masReponseJoin";
-
-					}else if(passtoSBJoinmsg.getContent().equals("DriverAboutMatch")) {
-						reddUrl = "http://localhost:8080/api/v1/driver/masReponseJoin";
-					}
-
-					returnPasstoSBDTO messageOBjectContent = (returnPasstoSBDTO) passtoSBJoinmsg.getContentObject();
-					sendJoinlistToSpringBoot(messageOBjectContent, reddUrl);
-					LocalTime currentTime = LocalTime.now();
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-					String formattedTime = currentTime.format(formatter);
-					System.out.println("Sent to SB from :: "+formattedTime +" -->"+ passtoSBJoinmsg.getSender().getLocalName());
-				} catch (Exception e) {
+					String reddUrl = BASE_API_URL +"/passenger/masReponseJoin";
+	 
+						//reddUrl = "http://localhost:8080/api/v1/passenger/masReponseJoin";
+					 
+					//	reddUrl = BASE_API_URL +"/driver/masReponseJoin";
+					  
+					ResJoinMachListDTO messageOBjectContent = (ResJoinMachListDTO) fromPassengerJoinListmsg.getContentObject();
+					
+					String jsonInputString = gson.toJson(messageOBjectContent);
+					sendJoinlistToSpringBoot(jsonInputString, reddUrl);
+					 
+				 } catch (Exception e) {
 					throw new RuntimeException(e);
 				} 
-			} else {
+			}
+			
+			if(fromPassengerFarRoutemsg != null) {
+				
+				
+				try {
+					String reddUrl = BASE_API_URL +"/passenger/masReponseFarRoute";
+	 
+					 
+					List<longrouteSegmentDTO> messageOBjectContent = (List<longrouteSegmentDTO>) fromPassengerJoinListmsg.getContentObject();
+					
+					String jsonInputString = gson.toJson(messageOBjectContent);
+					sendJoinlistToSpringBoot(jsonInputString, reddUrl);
+					 
+				 } catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+				else {
 				block();	
 			}
+			
+			
+			
+			
+			
 		}
 
-		private void sendJoinlistToSpringBoot(returnPasstoSBDTO messageContent, String redirectURL) throws Exception {
+		private void sendJoinlistToSpringBoot(String messageContent, String redirectURL) throws Exception {
 
 
-
+			System.out.println("Redirect URL: " + redirectURL);
 
 
 			URI uri = new URI(redirectURL);
@@ -93,11 +120,11 @@ public class JadetoSB extends Agent {
 			connection.setRequestProperty("Content-Type", "application/json");
 
 
-			String jsonInputString = gson.toJson(messageContent);
+			
 
 
 			try (OutputStream os = connection.getOutputStream()) {
-				byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+				byte[] input = messageContent.getBytes(StandardCharsets.UTF_8);
 				os.write(input, 0, input.length);
 			}
 
