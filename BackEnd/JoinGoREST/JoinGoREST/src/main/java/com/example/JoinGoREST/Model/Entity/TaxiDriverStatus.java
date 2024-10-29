@@ -30,6 +30,7 @@ public class TaxiDriverStatus{
 	private int taxiStatus;
 	private int onService=1;
 	
+	private String town;
 	private String phone;
 	private String nic;
 

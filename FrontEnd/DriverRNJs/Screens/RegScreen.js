@@ -9,19 +9,48 @@ import {
 import { RadioButton } from "react-native-paper";
 import tw from "twrnc";
 import FloatingLabelInput from "../Components/FloatingLabelInput";
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserInfo } from '../Slices/navSlice';
 
-const RegScreen = () => {
-  const [driverName, setDriverName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [nic, setNic] = useState("");
-  const [addressLine1, setAddressLine1] = useState("");
-  const [addressLine2, setAddressLine2] = useState("");
-  const [homeTown, setHomeTown] = useState("");
-  const [vehicleType, setVehicleType] = useState("");
+
+const RegScreen = ({navigation}) => {
+  const [driverName, setDriverName] = useState("John Doily");
+  const [phone, setPhone] = useState("01412542");
+  const [nic, setNic] = useState("12145XXX");
+  const [addressLine1, setAddressLine1] = useState("sdfss");
+  const [addressLine2, setAddressLine2] = useState("dfddf");
+  const [homeTown, setHomeTown] = useState("London");
+  const [vehicleType, setVehicleType] = useState('2');
+
+  const dispatch = useDispatch(); 
+
 
   const handleRegister = () => {
-    // Handle registration logic here
-    //  console.log({ driverName, phone, nic, addressLine1, addressLine2, homeTown, vehicleType });
+
+    const currentTimeMillis = Date.now();
+    const millisString = currentTimeMillis.toString();
+    const startIndex = Math.floor(millisString.length / 2) - 2;
+    const middleFourDigits = millisString.substring(startIndex, startIndex + 4);
+
+    const userid = driverName.trim() + middleFourDigits;
+
+    dispatch(
+        setUserInfo({ 
+          id: 0,
+          driverid: userid, 
+          drivername: driverName,
+          addressline1: addressLine1,
+          addressline2: addressLine2,
+          town: homeTown,
+        vehicletype: vehicleType,
+          nic: nic,
+          phone: phone,
+
+        })
+      );
+console.log(userid)
+      navigation.navigate("StartTaxi");
+    
   };
 
   return (
@@ -75,9 +104,9 @@ const RegScreen = () => {
           label="Home Town"
           value={homeTown}
           onChangeText={setHomeTown}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`} // Container styles for visibility
-          inputStyles={tw`h-12`} // Set a height for the input
-          labelStyles={tw`text-gray-600`} // Customize label styles if needed
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}  
+          inputStyles={tw`h-12`}  
+          labelStyles={tw`text-gray-600`}  
         />
       </View>
 
@@ -88,16 +117,16 @@ const RegScreen = () => {
           value={vehicleType}
         >
           <View style={tw`flex-row items-center mr-5`}>
-            <RadioButton value="Car" />
-            <Text>Car</Text>
+            <RadioButton value="1" />
+            <Text>Bike</Text>
           </View>
           <View style={tw`flex-row items-center mr-5`}>
-            <RadioButton value="Van" />
-            <Text>Van</Text>
+            <RadioButton value="2" />
+            <Text>Tuk</Text>
           </View>
           <View style={tw`flex-row items-center`}>
-            <RadioButton value="Bike" />
-            <Text>Bike</Text>
+            <RadioButton value="3" />
+            <Text>Car</Text>
           </View>
         </RadioButton.Group>
       </View>

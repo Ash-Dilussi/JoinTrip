@@ -41,6 +41,8 @@ const data = [
     image: LongRideImage,
     screen: "DistantRoute",
     ridetype: "3",
+    hint:"*Journey over 10km"
+                  
   },
   {
     id: "458",
@@ -84,6 +86,9 @@ const NavOptions = () => {
             />
           </View>
           <Text style={tw`mt-2 text-lg font-semibold`}>{item.title}</Text>
+          {item.hint ? (
+  <Text style={tw`text-base mb-1 text-gray-500`}>{item.hint}</Text>
+) : null}
           <Icon
             style={tw`p-2 bg-black rounded-full w-10 mt-4`}
             name="arrowright"

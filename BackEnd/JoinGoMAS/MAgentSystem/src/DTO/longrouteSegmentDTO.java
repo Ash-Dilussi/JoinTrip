@@ -10,7 +10,7 @@ public class longrouteSegmentDTO implements Serializable {
     
 
     public longrouteSegmentDTO(String tripid, int segno, Coordinate start, Coordinate end) {
-    	this.tripReqId= tripid;
+    	this.setTripReqId(tripid);
     	this.segNo = segno;
         this.start = start;
         this.end = end;
@@ -38,5 +38,13 @@ public class longrouteSegmentDTO implements Serializable {
 
 	public void setSegNo(int segNo) {
 		this.segNo = segNo;
+	}
+
+	public String getTripReqId() {
+		return tripReqId;
+	}
+
+	public void setTripReqId(String tripReqId) {
+		this.tripReqId = tripReqId;
 	}
 }

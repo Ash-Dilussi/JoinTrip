@@ -29,8 +29,8 @@ public class WebSocketController {
 	}
 
 	// Send updates to drivers
-	public void sendTripToDriver(DriverMatchResMAS update) {
-		messagingTemplate.convertAndSend("/topic/driver/updates", update);
+	public void sendTripToDriver(DriverMatchResMAS update, String userId) {
+		messagingTemplate.convertAndSend("/topic/driver/updates"+ userId, update);
 	}
 
 	// Send status updates to drivers

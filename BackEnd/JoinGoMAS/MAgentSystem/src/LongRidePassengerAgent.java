@@ -6,6 +6,7 @@ import java.util.List;
 import DTO.Coordinate;
 import DTO.JoinRequestDTO;
 import DTO.ResJoinMachListDTO;
+import DTO.TaxiRequestDTO;
 import DTO.longrouteSegmentDTO; 
 import jade.core.AID;
 import jade.core.Agent;
@@ -90,13 +91,23 @@ public class LongRidePassengerAgent extends Agent{
 			try {
 				DFAgentDescription[] result = DFService.search(this.getAgent(), template);
 				if (result.length > 0) {
+					TaxiRequestDTO toTaxi= new TaxiRequestDTO();
+					toTaxi.vehicletype = passengerData.getReqVehicletype();
+					toTaxi.JoinReqid = passengerData.getJoinReqId();
+					
+					
 					for (DFAgentDescription dfAgent : result) {
 for(longrouteSegmentDTO asegment: longRouteSegments) {
+	toTaxi.taxiReqid = asegment.getTripReqId()+ asegment.getSegNo();
+				  toTaxi.startLat = (float) asegment.getStart().getLatitude();
+				  toTaxi.startLon = (float) asegment.getStart().getLongitude();
+				  toTaxi.destLat = (float) asegment.getEnd().getLatitude();
+				  toTaxi.destLon = (float) asegment.getEnd().getLongitude();
 				  
 							ACLMessage msgnewalert = new ACLMessage(ACLMessage.INFORM); 
 							msgnewalert.addReceiver(dfAgent.getName());
 							msgnewalert.setConversationId("passengerTripCall");  
-							msgnewalert.setContentObject((Serializable) asegment); 
+							msgnewalert.setContentObject((Serializable) toTaxi); 
 
 
 							send(msgnewalert);
@@ -127,12 +138,23 @@ for(longrouteSegmentDTO asegment: longRouteSegments) {
 				
 if(!longRouteSegments.isEmpty()) {
 				try {
+					TaxiRequestDTO toTaxi= new TaxiRequestDTO();
+					toTaxi.vehicletype = passengerData.getReqVehicletype();
+					toTaxi.JoinReqid = passengerData.getJoinReqId();
+					
+					
 					ACLMessage response = taxiBroadcastMsg.createReply();
 					response.setConversationId("passengerTripCall");
 					response.setPerformative(ACLMessage.INFORM);  
 					
 					for(longrouteSegmentDTO asegment: longRouteSegments) {
-					response.setContentObject(asegment); 
+						
+						  toTaxi.startLat = (float) asegment.getStart().getLatitude();
+						  toTaxi.startLon = (float) asegment.getStart().getLongitude();
+						  toTaxi.destLat = (float) asegment.getEnd().getLatitude();
+						  toTaxi.destLon = (float) asegment.getEnd().getLongitude();
+						  
+					response.setContentObject((Serializable) toTaxi); 
 					send(response); 
 					}
 					

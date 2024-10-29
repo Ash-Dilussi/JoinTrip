@@ -21,12 +21,13 @@ public class JoinRequestDTO implements Serializable {
 	private String desplace_id;
 	
 	private long scheduleTime ; 
-	private int isRequestDone =0;
+	private int requestStatus =0;
 	
 	private int tripType=0;
 	private int SegmentDistance=0;
 	private List<Coordinate> longRoute;
 	private int userType;
+	private int reqVehicletype;
 	
  
 
@@ -100,13 +101,7 @@ public class JoinRequestDTO implements Serializable {
 
  
 
-	public int getIsRequestDone() {
-		return isRequestDone;
-	}
-
-	public void setIsRequestDone(int isRequestDone) {
-		this.isRequestDone = isRequestDone;
-	}
+ 
 
 	public int getTripType() {
 		return tripType;
@@ -138,6 +133,22 @@ public class JoinRequestDTO implements Serializable {
 
 	public void setUserType(int userType) {
 		this.userType = userType;
+	}
+
+	public int getReqVehicletype() {
+		return reqVehicletype;
+	}
+
+	public void setReqVehicletype(int reqVehicletype) {
+		this.reqVehicletype = reqVehicletype;
+	}
+
+	public int getRequestStatus() {
+		return requestStatus;
+	}
+
+	public void setRequestStatus(int requestStatus) {
+		this.requestStatus = requestStatus;
 	}
 
 

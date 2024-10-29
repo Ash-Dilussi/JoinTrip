@@ -177,14 +177,14 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 				e.printStackTrace();
 			}
 
-			long currentTime = System.currentTimeMillis() - startTime ;
-			long seconds = currentTime / 1000; // Total seconds
-			long hours = seconds / 3600; // Total hours
-			seconds %= 3600; // Remaining seconds after hours
-			long minutes = seconds / 60; // Total minutes
-			seconds %= 60; 
-			// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-			String formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+//			long currentTime = System.currentTimeMillis() - startTime ;
+//			long seconds = currentTime / 1000; // Total seconds
+//			long hours = seconds / 3600; // Total hours
+//			seconds %= 3600; // Remaining seconds after hours
+//			long minutes = seconds / 60; // Total minutes
+//			seconds %= 60; 
+//			 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+//			String formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
 
 			return  response ;
 		});

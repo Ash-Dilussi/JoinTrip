@@ -4,6 +4,8 @@ mvn clean install
 
 npx expo start
 
+npx expo start --port 8999
+
 
 
 List<?> list;  // A list that can hold any type (wildcard)

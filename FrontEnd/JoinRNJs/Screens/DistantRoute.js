@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Text, TouchableOpacity, PermissionsAndroid, View } from "react-native";
+import { Alert, Text, TouchableOpacity, PermissionsAndroid, View } from "react-native";
 import { Icon } from "react-native-elements";
 
 import tw from "twrnc";
@@ -11,7 +11,8 @@ import { useSelector } from "react-redux";
 import {
   selectDestination,
   selectOrigin,
-  setFarRoute,
+  setFarRoute, 
+  setTripDistanceKm
 } from "../slices/navSlice";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useDispatch } from "react-redux";
@@ -20,9 +21,10 @@ import axios from "axios";
 const DistantRoute = () => {
   const Stack = createStackNavigator();
   const mapRef = useRef(null);
-  const [route, setRoute] = useState([]);
+  const [route, setRoute] = useState([]); 
   const origin = useSelector(selectOrigin);
   const destination = useSelector(selectDestination);
+  
   const dispatch = useDispatch();
 
   const currentLocation = {
@@ -57,20 +59,27 @@ const DistantRoute = () => {
     })();
   }, [origin, destination]);
 
-  // Function to get the route from Google Maps Directions API
+ 
   const getRoute = async (pickupLat, pickupLng, destLat, destLng) => {
     try {
-      console.log(
-        "new " +
-          origin.location.lat +
-          "   " +
-          origin.location.lng +
-          "   destinaiton:=>  " +
-          destination.location.lat
-      );
+      //console.log( "new " + origin.location.lat + "   " + origin.location.lng + "   destinaiton:=>  " + destination.location.lat);
+      
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/directions/json?origin=${pickupLat},${pickupLng}&destination=${destLat},${destLng}&key=${GOOGLE_MAPS_APIKEY}`
       );
+
+      if (response.data.routes.length > 0) {
+        const tripdistance = response.data.routes[0].legs[0].distance; 
+        dispatch(setTripDistanceKm({
+          distance: tripdistance.value,
+          text: tripdistance.text
+        }))
+    
+       // console.log('Distance in meters:', distance.value);
+        
+      } else {
+        console.log('No route found');
+      }
       //console.log(response)
       const points = decodePolyline(
         response.data.routes[0].overview_polyline.points

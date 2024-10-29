@@ -9,8 +9,9 @@ import { store } from "./store";
 import Geolocation from "react-native-geolocation-service";
 import { KeyboardAvoidingView } from "react-native";
 import LoginScreen from "./Screens/LoginScreen";
-//import HomeScreen from "./Screens/HomeScreen";
+import StartTaxi from "./Screens/StartTaxi";
 import RegScreen from "./Screens/RegScreen";
+import TripRequestList from "./Screens/RegScreen";
 
 
 export default function App() {
@@ -33,6 +34,16 @@ export default function App() {
               <Stack.Screen
                 name="RegScreen"
                 component={RegScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="StartTaxi"
+                component={StartTaxi}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="TripRequestList"
+                component={TripRequestList}
                 options={{ headerShown: false }}
               />
             </Stack.Navigator>
