@@ -206,8 +206,7 @@ public class PassengerAgent extends Agent {
 						listToSB.setCurrentPassenger(passengerData);
 						listToSB.setJoinPassengerList(joinCompaitbleList);
 						
-						msgtoSB.setConversationId("fromPassengerJoinList"); 
-						//msgtoSB.setContent("passengerAboutJoint");
+						msgtoSB.setConversationId("fromPassengerJoinList");  
 						msgtoSB.setContentObject((Serializable) listToSB); 
 						msgtoSB.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
 						send(msgtoSB);

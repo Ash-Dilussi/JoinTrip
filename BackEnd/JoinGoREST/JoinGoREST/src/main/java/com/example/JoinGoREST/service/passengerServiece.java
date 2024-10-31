@@ -104,8 +104,7 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 
 	private CompletableFuture<ResponsetoFrontDTO> notifyJadeMAS(JoinRequestDTO registration) throws Exception {
 
-
-
+ 
 		JoinRequestDTO askingUser = registration;
 		return CompletableFuture.supplyAsync(() ->{
 			ResponsetoFrontDTO response = new ResponsetoFrontDTO();
@@ -136,7 +135,7 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 					}
 					
 					
-					if(!joindbresponse.isEmpty()) {// && joindbresponse.getAskingReqid().equals(re)
+					if(!joindbresponse.isEmpty()) {// && joindbresponse.getAskingReqid().equals(res)
 						List<ResponsePassengerDTO> tempJoinList = new ArrayList<>();
 
 						for(MasJoinList item: joindbresponse) {
@@ -176,15 +175,6 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
-
-//			long currentTime = System.currentTimeMillis() - startTime ;
-//			long seconds = currentTime / 1000; // Total seconds
-//			long hours = seconds / 3600; // Total hours
-//			seconds %= 3600; // Remaining seconds after hours
-//			long minutes = seconds / 60; // Total minutes
-//			seconds %= 60; 
-//			 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-//			String formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
 
 			return  response ;
 		});

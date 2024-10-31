@@ -11,5 +11,6 @@ public class TaxiRequestDTO{
 	public float destLat=0;
 	public float destLon=0;
 	public String JoinReqid;
+	public String destinationName;
 	public int vehicletype; 
 }

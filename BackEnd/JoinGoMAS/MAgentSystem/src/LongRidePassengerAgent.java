@@ -136,7 +136,7 @@ for(longrouteSegmentDTO asegment: longRouteSegments) {
 
 			if(taxiBroadcastMsg != null) {
 				
-if(!longRouteSegments.isEmpty()) {
+				if(!longRouteSegments.isEmpty()) {
 				try {
 					TaxiRequestDTO toTaxi= new TaxiRequestDTO();
 					toTaxi.vehicletype = passengerData.getReqVehicletype();
@@ -148,7 +148,7 @@ if(!longRouteSegments.isEmpty()) {
 					response.setPerformative(ACLMessage.INFORM);  
 					
 					for(longrouteSegmentDTO asegment: longRouteSegments) {
-						
+						  toTaxi.taxiReqid = asegment.getTripReqId()+ asegment.getSegNo(); 
 						  toTaxi.startLat = (float) asegment.getStart().getLatitude();
 						  toTaxi.startLon = (float) asegment.getStart().getLongitude();
 						  toTaxi.destLat = (float) asegment.getEnd().getLatitude();

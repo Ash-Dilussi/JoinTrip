@@ -11,7 +11,7 @@ import { KeyboardAvoidingView } from "react-native";
 import LoginScreen from "./Screens/LoginScreen";
 import StartTaxi from "./Screens/StartTaxi";
 import RegScreen from "./Screens/RegScreen";
-import TripRequestList from "./Screens/RegScreen";
+import TripRequestList from "./Screens/TripRequestList";
 
 
 export default function App() {

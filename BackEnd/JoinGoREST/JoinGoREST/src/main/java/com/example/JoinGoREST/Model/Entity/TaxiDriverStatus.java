@@ -20,7 +20,7 @@ public class TaxiDriverStatus{
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO) 
 	private Integer Id;
-	private String Driverid;
+	private String driverid;
 	private String Drivername;
 	private float currentLon=0;
 	private float currentLat=0;

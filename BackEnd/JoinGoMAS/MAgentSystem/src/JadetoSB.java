@@ -62,8 +62,7 @@ public class JadetoSB extends Agent {
 
 				try {
 					String reddUrl = BASE_API_URL +"/passenger/masReponseJoin";
-	 
-						//reddUrl = "http://localhost:8080/api/v1/passenger/masReponseJoin";
+	  
 					 
 					//	reddUrl = BASE_API_URL +"/driver/masReponseJoin";
 					  

@@ -9,24 +9,21 @@ import {
 import { RadioButton } from "react-native-paper";
 import tw from "twrnc";
 import FloatingLabelInput from "../Components/FloatingLabelInput";
-import { useDispatch, useSelector } from 'react-redux';
-import { setUserInfo } from '../Slices/navSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { setUserInfo } from "../Slices/navSlice";
 
-
-const RegScreen = ({navigation}) => {
+const RegScreen = ({ navigation }) => {
   const [driverName, setDriverName] = useState("John Doily");
   const [phone, setPhone] = useState("01412542");
   const [nic, setNic] = useState("12145XXX");
   const [addressLine1, setAddressLine1] = useState("sdfss");
   const [addressLine2, setAddressLine2] = useState("dfddf");
   const [homeTown, setHomeTown] = useState("London");
-  const [vehicleType, setVehicleType] = useState('2');
+  const [vehicleType, setVehicleType] = useState("2");
 
-  const dispatch = useDispatch(); 
-
+  const dispatch = useDispatch();
 
   const handleRegister = () => {
-
     const currentTimeMillis = Date.now();
     const millisString = currentTimeMillis.toString();
     const startIndex = Math.floor(millisString.length / 2) - 2;
@@ -35,22 +32,20 @@ const RegScreen = ({navigation}) => {
     const userid = driverName.trim() + middleFourDigits;
 
     dispatch(
-        setUserInfo({ 
-          id: 0,
-          driverid: userid, 
-          drivername: driverName,
-          addressline1: addressLine1,
-          addressline2: addressLine2,
-          town: homeTown,
+      setUserInfo({
+        id: 0,
+        driverid: userid,
+        drivername: driverName,
+        addressline1: addressLine1,
+        addressline2: addressLine2,
+        town: homeTown,
         vehicletype: vehicleType,
-          nic: nic,
-          phone: phone,
-
-        })
-      );
-console.log(userid)
-      navigation.navigate("StartTaxi");
-    
+        nic: nic,
+        phone: phone,
+      })
+    );
+    console.log(userid);
+    navigation.navigate("StartTaxi");
   };
 
   return (
@@ -104,9 +99,9 @@ console.log(userid)
           label="Home Town"
           value={homeTown}
           onChangeText={setHomeTown}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}  
-          inputStyles={tw`h-12`}  
-          labelStyles={tw`text-gray-600`}  
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}
+          inputStyles={tw`h-12`}
+          labelStyles={tw`text-gray-600`}
         />
       </View>
 

@@ -15,19 +15,18 @@ const JoinListScreen = () => {
   
   const joinListdata = [];
 
-
-  
+ 
   useFocusEffect(
     useCallback(() => {
-     // console.log("home focused!"); 
+  
      joinList.forEach((item)=>{
       joinListdata.push(item)
      })
      
       return () => {
-       // console.log(" home navigating away.");
+     
       };
-    }, [])
+    }, [isModalVisible])
   );
 
   const handleItemPress = (item) => {
