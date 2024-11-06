@@ -19,8 +19,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
-		config.enableSimpleBroker("/topic");
-		config.setApplicationDestinationPrefixes("/JoinGoapp");
+		config.enableSimpleBroker("/specific");// Prefix for messages from server to client
+		config.setApplicationDestinationPrefixes("/JoinGoapp");// Prefix for messages from client to server
 	}
 
 }

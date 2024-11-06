@@ -32,30 +32,24 @@ public class JoinRequestDTO {
 	public long scheduleTime;
 	public int tripType=0;
 	public int SegmentDistance=0;
-	public RouteDTO longRoute;
+	public List<Coordinate> longRoute;
 	public int userType;
 	
 	public Passenger userInfo ;
 	
 	public  Date getScheduleTimeinDate() {
+		System.out.println(scheduleTime);
+		
+		if(scheduleTime == 0) {
+			return new Date();
+		}else {
 		return new Date(scheduleTime);
+		}
 	}
 
 }
 
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
- class Coordinate {
-    public double latitude;
-    public double longitude;
-    }
 
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class RouteDTO { 
-    public List<Coordinate> routeCoordinates; 
-    }
+ 

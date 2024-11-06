@@ -15,5 +15,6 @@ public class ResponsePassengerDTO{
 	public String phone;
 	public char gender;
 	public String town;
+	public String joinReqId;
 
 }

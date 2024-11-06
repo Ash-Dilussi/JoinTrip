@@ -24,4 +24,8 @@ public class TaxiDriver{
 	private float homeLat=0;
 	private float homeLon=0;
 	private int vehicletype; 
+	
+	private String town;
+	private String phone;
+	private String nic;
 }

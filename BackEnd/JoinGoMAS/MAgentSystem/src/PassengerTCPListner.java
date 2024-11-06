@@ -107,6 +107,10 @@ public class PassengerTCPListner extends Agent {
 				}else if(passenger.getTripType() == 4){
 					AgentController schedulepassengerAgent = container.createNewAgent(passenger.getJoinReqId(), SchedulPasngerAgent.class.getName(), args);
 					schedulepassengerAgent.start();
+				}else if(passenger.getTripType() == 3) {
+					AgentController longridepassengerAgent = container.createNewAgent(passenger.getJoinReqId(), LongRidePassengerAgent.class.getName(), args);
+					longridepassengerAgent.start();
+					
 				}
 				//System.out.println("Created agent: " +passenger.getJoinReqId());
 			} catch (StaleProxyException e) {

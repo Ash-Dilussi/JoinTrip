@@ -15,9 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.JoinGoREST.Model.DTO.JoinReqMsgDTO;
 import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
 import com.example.JoinGoREST.Model.DTO.JoinResponseListDTO;
+import com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO;
+import com.example.JoinGoREST.Model.DTO.ResponsetoFrontDTO;
 import com.example.JoinGoREST.Model.Entity.JoinRequest;
+import com.example.JoinGoREST.Model.Entity.LongDistanceSegment;
 import com.example.JoinGoREST.Model.Entity.MasJoinList;
 import com.example.JoinGoREST.Model.Entity.Passenger;
 import com.example.JoinGoREST.service.Ipassenger;
@@ -58,7 +62,7 @@ public class PassengerController {
 	}
 
 	@PostMapping("/createRideRequest")
-	public CompletableFuture<String> createRideRequest(@RequestBody JoinRequestDTO joinrequest){
+	public CompletableFuture<ResponsetoFrontDTO> createRideRequest(@RequestBody JoinRequestDTO joinrequest){
 		try { 
  
 		System.out.println("hit to createRideRequest:   ");
@@ -83,5 +87,30 @@ public class PassengerController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad match reponse"+ ex);
 		}
 	}
+	
+	@PostMapping("/masReponseFarRoute")
+	public String  fromMasFarRoute(@RequestBody List<LongDistanceSegment> joinPassengerSegmentsJSON) {
+		try { 
 
+			 System.out.println("Conrtoller: hit from mas: ");  
+
+			return _passenger.farRouteSave(joinPassengerSegmentsJSON);
+
+		}catch(Exception ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad match reponse"+ ex);
+		}
+	}
+
+	@PostMapping("/msgJoinControl")
+	public String  MSGJoinControl(@RequestBody JoinReqMsgDTO msgJoin) {
+		try { 
+
+			 System.out.println("front msg :"+ msgJoin.receiverUserId);  
+
+			return _passenger.joinMsgManager(msgJoin);
+
+		}catch(Exception ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad match reponse"+ ex);
+		}
+	}
 }

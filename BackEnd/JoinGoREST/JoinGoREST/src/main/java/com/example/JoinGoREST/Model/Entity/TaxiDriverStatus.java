@@ -20,14 +20,18 @@ public class TaxiDriverStatus{
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO) 
 	private Integer Id;
-	private String Driverid;
+	private String driverid;
 	private String Drivername;
 	private float currentLon=0;
 	private float currentLat=0;
 	private float headingLat=0;
-	private float headingLon=0;
+	private float headingLon=0; 
 	private int vehicletype;
 	private int taxiStatus;
 	private int onService=1;
+	
+	private String town;
+	private String phone;
+	private String nic;
 
 }

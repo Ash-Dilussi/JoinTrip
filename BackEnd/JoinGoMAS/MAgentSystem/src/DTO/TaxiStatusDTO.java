@@ -13,6 +13,11 @@ public class TaxiStatusDTO{
 	private int taxiStatus;
 	private int onService =1;
 
+	private String phone;
+	private String nic;
+	
+	
+	
 	public String getDriverid() {
 		return Driverid;
 	}
@@ -66,6 +71,18 @@ public class TaxiStatusDTO{
 	}
 	public void setOnService(int onService) {
 		this.onService = onService;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getNic() {
+		return nic;
+	}
+	public void setNic(String nic) {
+		this.nic = nic;
 	}
 
 }
