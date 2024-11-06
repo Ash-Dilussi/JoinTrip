@@ -6,6 +6,7 @@ import RegScreen from "./Screens/RegScreen";
 import ToMapScreen from "./Screens/ToMapScreen";
 import DistantRoute from "./Screens/DistantRoute";
 import JoinListScreen from "./Screens/JoinListScreen";
+import ScheduleScreen from "./Screens/ScheduleScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
@@ -55,6 +56,11 @@ export default function App() {
               <Stack.Screen
                 name="JoinListScreen"
                 component={JoinListScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ScheduleScreen"
+                component={ScheduleScreen}
                 options={{ headerShown: false }}
               />
             </Stack.Navigator>

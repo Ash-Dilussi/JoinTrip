@@ -18,7 +18,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-// Define a PassengerAgent class representing a passenger seeking a taxi ride
+ 
 public class PassengerAgent extends Agent {
 
 	private long startTime;
@@ -74,9 +74,6 @@ public class PassengerAgent extends Agent {
 
 
 	}
-
-
-
 
 
 

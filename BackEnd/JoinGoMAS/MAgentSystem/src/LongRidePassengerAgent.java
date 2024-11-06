@@ -70,9 +70,7 @@ public class LongRidePassengerAgent extends Agent{
 		
 
 		addBehaviour(new newtoDriverBroadcast());  
-
-
-
+ 
 
 	}
 	

@@ -1,41 +1,48 @@
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
-import {API_BASE_URL} from "@env";
-
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import { WEBSOCKET_URL } from "@env";
+import { useDispatch, useSelector } from "react-redux";
+import {} from "../slices/navSlice";
  
-const WEBSOCKET_URL = API_BASE_URL;  
 
 class WebSocketService {
   constructor() {
     this.stompClient = null;
+    this.privateStompClient = null;
+    
   }
 
-  // Initialize WebSocket connection and subscribe to topics
-  connect(onPassengerRequest ) {
+  // Connect to the WebSocket and set up subscriptions
+  connect(userInfo) {
     const socket = new SockJS(WEBSOCKET_URL);
-    this.stompClient = new Client({
-      webSocketFactory: () => socket,
-      debug: (str) => console.log(str),
-      onConnect: () => {
-        console.log('Connected to WebSocket');
+    try {
+      this.stompClient = new Client({
+        webSocketFactory: () => socket,
+        debug: (str) => console.log("11",str, socket),
+        onConnect: () => {
+          console.log("Connected to WebSocket:",userInfo.primaryUserInfo.userid);
+         
 
-        
-        this.stompClient.subscribe('/topic/passenger/requests', (message) => {
-          onPassengerRequest(JSON.parse(message.body));
-        });
+          this.stompClient.subscribe(
+            `/topic/passenger/requests/${userInfo.primaryUserInfo.userid}`,
+            (message) => {
+              // const parsedMessage = JSON.parse(message.body);
+              console.log("parsedMessage:" ,message.body);
+            }
+          );
+        },
+        onDisconnect: () => {
+          console.log("Disconnected from WebSocket");
+        },
+        reconnectDelay: 100, // Reconnect if disconnected: delay
+      });
 
-      
-      },
-      onDisconnect: () => {
-        console.log('Disconnected from WebSocket');
-      },
-      reconnectDelay: 5000, // Reconnect every 5 seconds if disconnected
-    });
-
-    this.stompClient.activate();
+      this.stompClient.activate();
+    } catch (error) {
+      console.error("Error subscribong", error);
+    }
   }
 
-  
   disconnect() {
     if (this.stompClient) {
       this.stompClient.deactivate();

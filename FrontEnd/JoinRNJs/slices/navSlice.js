@@ -12,6 +12,7 @@ const initialState= {
     joinList: [],
     segmentDistanceKm:10,
     tripDistanceKm:0,
+    currentJoinReqId: null,
 }
 
 export const navSlice = createSlice({
@@ -54,10 +55,13 @@ export const navSlice = createSlice({
         setTripDistanceKm:(state,action)=>{
             state.tripDistanceKm = action.payload;
         },
+        setCurrentJoinReqId:(state,action)=>{
+            state.currentJoinReqId = action.payload;
+        },
     },
 });
 
-export const {setOrigin, setDestination, setTravelTimeInformation, setFarRoute, setRideType, setScheduleTime, setUserType, setUserInfo, addJoinList, clearJoinList,setSegmentDistanceKm,setTripDistanceKm}= navSlice.actions;
+export const {setOrigin, setDestination, setTravelTimeInformation, setFarRoute, setRideType, setScheduleTime, setUserType, setUserInfo, addJoinList, clearJoinList,setSegmentDistanceKm,setTripDistanceKm,setCurrentJoinReqId}= navSlice.actions;
 
 //selectors: import data from the global states
 export const selectOrigin = (state) => state.nav.origin;
@@ -71,6 +75,7 @@ export const selectUserInfo = (state) => state.nav.userInfo;
 export const selectJoinList = (state) => state.nav.joinList;
 export const selectSegmentDistanceKm = (state) => state.nav.segmentDistanceKm;
 export const selectTripDistanceKm = (state) => state.nav.tripDistanceKm;
+export const selectCurrentJoinReqId = (state) => state.nav.currentJoinReqId;
 
 
 export default navSlice.reducer;

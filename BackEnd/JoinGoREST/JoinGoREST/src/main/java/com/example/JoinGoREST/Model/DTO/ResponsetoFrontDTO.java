@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ResponsetoFrontDTO {
 	
-	
+public String joinReqId;
  public List<ResponsePassengerDTO> joinList;
  public List<LongDistanceSegment> farRouteSegs;
  private String other;

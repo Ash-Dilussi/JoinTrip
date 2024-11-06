@@ -34,14 +34,6 @@ const DistantRoute = () => {
 
   useEffect(() => {
     (async () => {
-      //   let { status } = await Location.requestForegroundPermissionsAsync();
-      //   if (status !== "granted") {
-      //     console.log("Permission to access location was denied");
-      //     return;
-      //   }
-      //   let currentLocation = await Location.getCurrentPositionAsync({});
-      //   setLocation(currentLocation);
-      //console.log("info "+origin.location.lat+"   "+origin.location.lng+"   destinaiton:=>  "+ destination.location.lat);
 
       if (!origin || !destination) return;
       mapRef.current.fitToSuppliedMarkers(["origin", "destination"], {

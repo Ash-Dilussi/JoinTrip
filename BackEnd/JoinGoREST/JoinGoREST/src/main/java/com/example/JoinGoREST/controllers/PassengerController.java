@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.JoinGoREST.Model.DTO.JoinReqMsgDTO;
 import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
 import com.example.JoinGoREST.Model.DTO.JoinResponseListDTO;
 import com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO;
@@ -100,4 +101,16 @@ public class PassengerController {
 		}
 	}
 
+	@PostMapping("/msgJoinControl")
+	public String  MSGJoinControl(@RequestBody JoinReqMsgDTO msgJoin) {
+		try { 
+
+			 System.out.println("front msg :"+ msgJoin.receiverUserId);  
+
+			return _passenger.joinMsgManager(msgJoin);
+
+		}catch(Exception ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad match reponse"+ ex);
+		}
+	}
 }

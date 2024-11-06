@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.JoinGoREST.Model.DTO.JoinReqMsgDTO;
 import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
 import com.example.JoinGoREST.Model.DTO.JoinResponseListDTO;
 import com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO;
@@ -18,6 +19,7 @@ import com.example.JoinGoREST.Model.Entity.JoinRequest;
 import com.example.JoinGoREST.Model.Entity.LongDistanceSegment;
 import com.example.JoinGoREST.Model.Entity.MasJoinList;
 import com.example.JoinGoREST.Model.Entity.Passenger;
+import com.example.JoinGoREST.Model.Enum.JoinReqStatus;
 import com.example.JoinGoREST.controllers.WebSocketController;
 import com.example.JoinGoREST.repo.JoinRequestRepo;
 import com.example.JoinGoREST.repo.LongDistanceSegmentsRepo;
@@ -120,8 +122,10 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 
 				out.println(jsonMessage); 
 
-				List<MasJoinList> joindbresponse = new ArrayList<>();
+				MasJoinList joindbresponse = new MasJoinList();
 				List<LongDistanceSegment> longdistanceresponse = new ArrayList<>();
+				
+				
 				while (response.getJoinList() == null || response.getJoinList().isEmpty()) {
 
 					//if ((System.currentTimeMillis() - startTime)% CHECK_INTERVAL  == 0) {
@@ -135,20 +139,22 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 					}
 					
 					
-					if(!joindbresponse.isEmpty()) {// && joindbresponse.getAskingReqid().equals(res)
+					if(joindbresponse != null) {
 						List<ResponsePassengerDTO> tempJoinList = new ArrayList<>();
 
-						for(MasJoinList item: joindbresponse) {
-							for(String ajoin: item.getJoinlistReqid()) {
+				
+							for(String ajoin: joindbresponse.getJoinlistReqid()) {
 
 								Passenger res = _passengerepo.getResponsePassforreqId(ajoin);
 
-								tempJoinList.add(new ResponsePassengerDTO(res.getUserid(),res.getFirstName(),res.getLastName(),res.getPhone(),res.getGender(),res.getTown()));
+								tempJoinList.add(new ResponsePassengerDTO(res.getUserid(),res.getFirstName(),res.getLastName(),res.getPhone(),res.getGender(),res.getTown(),ajoin));
 
 							}
 
-						}
+						response.setJoinReqId(askingUser.joinReqId);
 						response.setJoinList(tempJoinList);
+						joinMsgTimer(askingUser.joinReqId,1);
+						
 						System.out.println("Received from MAS: " +CHECK_INTERVAL+ response);
 					}
 					
@@ -158,7 +164,7 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 
 					//}
 
-					//				     
+								     
 					if (System.currentTimeMillis() - startTime > TIMEOUT_MILLIS) {
 						System.out.println("Timeout waiting for response from MAS.");
 						return  response ;
@@ -219,9 +225,12 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 	@Override
 	@Transactional
 	public void joinlistfromMAS(MasJoinList msg) {
-		// TODO Auto-generated method stub
+	 
 
-		_maslistrepo.save(msg);
+		_maslistrepo.findByAskingReqid(msg.getAskingReqid()).map(jlist ->{
+			jlist.setJoinlistReqid(msg.getJoinlistReqid());
+			return _maslistrepo.save(msg);
+		}).orElse( _maslistrepo.save(msg));
 
 	}
 
@@ -256,6 +265,57 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 	@Override
 	public String farRouteSaveInform(LongDistanceSegment farRouteSegData) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String joinMsgManager(JoinReqMsgDTO msgJoin) {
+		 System.out.println(msgJoin.reqStatus+"   "+ msgJoin.receiverUserId);
+		switch(msgJoin.reqStatus) {
+		case Reqeust:
+			_webSocketController.sendRideRequestToPassenger(msgJoin, msgJoin.receiverUserId);
+			break;
+		case Accept:
+			_webSocketController.sendRideRequestToPassenger(msgJoin, msgJoin.senderUserId);
+			
+			//genreate taxi request
+			
+			joinMsgTimer(msgJoin.senderJoinReqId,0);
+			joinMsgTimer(msgJoin.reveiverJoinReqId,0);
+			break;
+		case Decline:
+			_webSocketController.sendRideRequestToPassenger(msgJoin, msgJoin.senderUserId);
+			break;
+		default:
+			break;
+		}
+		return "msg processed";
+	}
+	
+	@Transactional
+	private String joinMsgTimer(String JoinTripReqId, int isNewMsg) {
+		JoinReqMsgDTO joinmsgupdate = new JoinReqMsgDTO();
+		
+		if(isNewMsg == 0) {
+		MasJoinList joindbresponse = _maslistrepo.matchcall(JoinTripReqId);
+		
+				
+		if(!joindbresponse.getJoinlistReqid().isEmpty()) {
+			
+		
+			joinmsgupdate.senderJoinReqId = JoinTripReqId;
+			
+			joinmsgupdate.reqStatus = JoinReqStatus.Accept;
+					
+			for(String ajoin: joindbresponse.getJoinlistReqid()) {
+			
+				Passenger res = _passengerepo.getResponsePassforreqId(ajoin);
+				_webSocketController.sendRideRequestToPassenger(joinmsgupdate, res.getUserid());
+			}
+		}
+		}
+		
 		return null;
 	}
 

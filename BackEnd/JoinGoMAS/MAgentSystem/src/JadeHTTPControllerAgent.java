@@ -32,7 +32,7 @@ public class JadeHTTPControllerAgent extends Agent{
 		System.out.println("Controller Agent " + getLocalName() + " is ready.");
 		startHttpServer();
 
-		// Add JADE behaviour to receive ACL messages
+		 
 		addBehaviour(new CyclicBehaviour(this) {
 			@Override
 			public void action() {

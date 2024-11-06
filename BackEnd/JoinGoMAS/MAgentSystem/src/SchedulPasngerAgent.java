@@ -24,7 +24,7 @@ import jade.lang.acl.UnreadableException;
 public class SchedulPasngerAgent extends Agent {
 
 
-	private static final long TIME_LIMIT = 300000;
+	//private static final long TIME_LIMIT = 300000;
 	private static int 	closeradius= 2;
 	private  JoinRequestDTO passengerData = new JoinRequestDTO();
 	//private JoinRequestDTO comparePassenger = new JoinRequestDTO();
@@ -76,7 +76,7 @@ public class SchedulPasngerAgent extends Agent {
 			System.out.println("++Scedule agent Created : " +getAID().getLocalName() + ": scheduled: " +passengerData.getDelelteTime() );
 
 
-			addBehaviour(new agentdeteTimer(this, TIME_LIMIT));
+			//addBehaviour(new agentdeteTimer(this, TIME_LIMIT));
 			addBehaviour(new sendorinfotoMatch());
 			addBehaviour(new destinationBroadcast());
 

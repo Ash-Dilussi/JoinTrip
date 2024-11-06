@@ -6,6 +6,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import com.example.JoinGoREST.Model.DTO.DriverMatchResMAS;
+import com.example.JoinGoREST.Model.DTO.JoinReqMsgDTO;
 import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
 import com.example.JoinGoREST.Model.Entity.TaxiRequest;
 
@@ -18,12 +19,13 @@ public class WebSocketController {
 		this.messagingTemplate = messagingTemplate;
 	}
 
-	// Send ride request to passengers
-	public void sendRideRequestToPassenger(JoinRequestDTO request) {
-		messagingTemplate.convertAndSend("/topic/passenger/requests", request);
+	// Send join request to passengers
+	public void sendRideRequestToPassenger(JoinReqMsgDTO request, String userId) {
+		System.out.println("To the Mbile: "+userId);
+		messagingTemplate.convertAndSend("/topic/passenger/requests"+ userId, request);
 	}
 
-	// Send notifications to passengers
+	// Send new ride notifications to passengers
 	public void sendNotificationToPassenger(JoinRequestDTO notification) {
 		messagingTemplate.convertAndSend("/topic/passenger/notifications", notification);
 	}

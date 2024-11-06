@@ -24,7 +24,8 @@ import {
   selectUserInfo,
   clearJoinList,
   addJoinList,
-  selectSegmentDistanceKm
+  selectSegmentDistanceKm,
+  setCurrentJoinReqId
 } from "../slices/navSlice";
 import carImage from "../assets/joinCar.jpg";
 import tukImage from "../assets/joinTuk.jpg";
@@ -137,7 +138,7 @@ const SelectOptionCard = ({ navigation }) => {
 
       //console.log(`${API_BASE_URL}/passenger/createRideRequest`);
      // console.log("userinfo:  ", userinfo);
-      console.log("vehicleinfo:  ", useridapi);
+    //  console.log("vehicleinfo:  ", useridapi);
       //console.log("long rout:  ",routeCoordinates);
 
       const response = await axios.post(
@@ -163,10 +164,11 @@ const SelectOptionCard = ({ navigation }) => {
       clearJoinList;
 
       if (response.data) {
-        console.log("Got a Response:", response.data);
+        //console.log("Got a Response:", response.data);
 
         if (apiridetype == 2) {
           const itemsArray = response.data.joinList;
+        dispatch((setCurrentJoinReqId(response.data.joinReqId)));
           if (itemsArray) {
             itemsArray.forEach((item) => {
               dispatch(addJoinList(item));
@@ -178,6 +180,7 @@ const SelectOptionCard = ({ navigation }) => {
           const itemsArray = response.data.farRouteSegs;
           console.log(itemsArray);
         } else if (apiridetype == 4) {
+          navigation.navigate("ScheduleScreen");
         }
       } else {
         console.log("Ride request unsuccessful:", response.data.message);
