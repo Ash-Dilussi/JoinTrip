@@ -13,14 +13,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 
-		registry.addEndpoint("/joinGoSB").withSockJS();
+		registry.addEndpoint("/joinGoSB").setAllowedOrigins("*").withSockJS();
 
 	}
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
-		config.enableSimpleBroker("/specific");// Prefix for messages from server to client
-		config.setApplicationDestinationPrefixes("/JoinGoapp");// Prefix for messages from client to server
+		config.enableSimpleBroker("/ all","/specific");// Prefix for messages from server to client
+		config.setApplicationDestinationPrefixes("/joinGoapp");// Prefix for messages from client to server
 	}
 
 }

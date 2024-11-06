@@ -1,15 +1,24 @@
+import { TextDecoder, TextEncoder } from 'text-encoding';
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { WEBSOCKET_URL } from "@env";
 import { useDispatch, useSelector } from "react-redux";
 import {} from "../slices/navSlice";
  
+// Polyfill for TextDecoder and TextEncoder in React Native
+if (typeof global.TextDecoder === 'undefined') {
+  global.TextDecoder = TextDecoder;
+}
+
+if (typeof global.TextEncoder === 'undefined') {
+  global.TextEncoder = TextEncoder;
+}
 
 class WebSocketService {
   constructor() {
     this.stompClient = null;
     this.privateStompClient = null;
-    
+
   }
 
   // Connect to the WebSocket and set up subscriptions
@@ -18,22 +27,24 @@ class WebSocketService {
     try {
       this.stompClient = new Client({
         webSocketFactory: () => socket,
-        debug: (str) => console.log("11",str, socket),
+        debug: (str) => console.log("11",str, socket.url),
         onConnect: () => {
-          console.log("Connected to WebSocket:",userInfo.primaryUserInfo.userid);
          
-
           this.stompClient.subscribe(
-            `/topic/passenger/requests/${userInfo.primaryUserInfo.userid}`,
+            `/specific/passenger/requests/${userInfo.primaryUserInfo.userid}`,
             (message) => {
               // const parsedMessage = JSON.parse(message.body);
               console.log("parsedMessage:" ,message.body);
             }
           );
+        },  
+         onStompError: (error) => {
+          console.error("STOMP error:", error.headers.message || error.body || error);
         },
         onDisconnect: () => {
           console.log("Disconnected from WebSocket");
-        },
+        }, // Connection error handler
+     
         reconnectDelay: 100, // Reconnect if disconnected: delay
       });
 

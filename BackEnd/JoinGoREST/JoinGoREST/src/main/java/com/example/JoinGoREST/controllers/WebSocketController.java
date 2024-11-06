@@ -22,7 +22,7 @@ public class WebSocketController {
 	// Send join request to passengers
 	public void sendRideRequestToPassenger(JoinReqMsgDTO request, String userId) {
 		System.out.println("To the Mbile: "+userId);
-		messagingTemplate.convertAndSend("/topic/passenger/requests"+ userId, request);
+		messagingTemplate.convertAndSend("/specific/passenger/requests/"+ userId, request);
 	}
 
 	// Send new ride notifications to passengers
@@ -32,7 +32,7 @@ public class WebSocketController {
 
 	// Send updates to drivers
 	public void sendTripToDriver(DriverMatchResMAS update, String userId) {
-		messagingTemplate.convertAndSend("/topic/driver/updates"+ userId, update);
+		messagingTemplate.convertAndSend("/topic/driver/updates/"+ userId, update);
 	}
 
 	// Send status updates to drivers

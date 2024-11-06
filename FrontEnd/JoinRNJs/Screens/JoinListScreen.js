@@ -55,7 +55,7 @@ const JoinListScreen = () => {
           reqStatus: 2,
         }
       );
-      console.log(joinReqId)
+      console.log("from "+joinReqId)
     } catch (error) {
       console.error("Error sending route to backend:", error);
     }
