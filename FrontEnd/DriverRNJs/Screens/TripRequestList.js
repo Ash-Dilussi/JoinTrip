@@ -11,9 +11,10 @@ const TripRequestList = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const userInfo = useSelector(selectUserInfo);
-  const tripReqList = useSelector(selectTripreqList);
+  const tripReqList = useSelector(selectTripreqList)|| [];
+  const dispatch = useDispatch();
 
-  const passReqListdata = [];
+  const [passReqListdata, setPassReqListdata] = useState([]);
 
   const handleItemPress = (item) => {
     setSelectedItem(item);
@@ -27,7 +28,7 @@ const TripRequestList = () => {
 
   useEffect(() => {
     // Connect to the WebSocket with userInfo from Redux
-    WebSocketService.connect(userInfo);
+    WebSocketService.connect(userInfo, dispatch);
 
     return () => {
       WebSocketService.disconnect();
@@ -35,14 +36,15 @@ const TripRequestList = () => {
   }, []);
 
   useEffect(() => {
-    console.log(tripReqList);
-    if (!tripReqList || tripReqList.length === 0) {
-      tripReqList.forEach((item) => {
-        passReqListdata.push(item);
-      });
-    }
+    
 
-    return () => {};
+    const updateList = tripReqList.map((item, index) => ({
+      ...item,
+      id: index + 1,
+    }));
+
+    setPassReqListdata(updateList);
+    console.log(passReqListdata);
   }, [tripReqList]);
 
   if (!passReqListdata || passReqListdata.length === 0) {
@@ -59,19 +61,18 @@ const TripRequestList = () => {
   return (
     <PaperProvider>
       <View style={tw`flex-1 pt-12 px-5`}>
-        <Text style={tw`text-2xl font-bold mb-5 text-center`}>Join List</Text>
+        <Text style={tw`text-2xl font-bold mb-5 text-center`}>Your Trip List</Text>
 
         <FlatList
           data={passReqListdata}
-          keyExtractor={(item) => item.userid}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={tw`p-4 bg-gray-100 border-b border-gray-300 rounded-lg mb-2`}
               onPress={() => handleItemPress(item)}
             >
-              <Text style={tw`text-lg`}>
-                {item.firstName} {item.lastName}
-              </Text>
+              <Text style={tw`text-lg`}> To: {item.parsedMessage.destinationName} </Text>
+              <Text style={tw`text-lg`}> Price:{item.parsedMessage.startLon} </Text>
             </TouchableOpacity>
           )}
         />
@@ -89,31 +90,33 @@ const TripRequestList = () => {
               {selectedItem && (
                 <>
                   <Text style={tw`text-xl font-bold mb-5`}>
-                    {selectedItem.firstName} {selectedItem.lastName}
+                    Ride Distance: {selectedItem.parsedMessage.startLon}
                   </Text>
                   <Text style={tw`text-base mb-1 text-center`}>
-                    {selectedItem.taxiRequest.JoinReqid}
+                    To: {selectedItem.parsedMessage.destinationName}
                   </Text>
                   <Text style={tw`text-base mb-1 text-center`}>
-                    {selectedItem.taxiRequest.destinationName}
+                    Your Cut:  {selectedItem.parsedMessage.startLon}
                   </Text>
                   <Text style={tw`text-base mb-1 text-center`}>
-                    {selectedItem.phone}
+                    Phone: {selectedItem.parsedMessage.startLon}
                   </Text>
-                  <Text style={tw`text-base mb-1 text-center`}>
-                    Here waiting for taxi
+                  <Text style={tw`text-xl mt-4 text-center`}>
+                   Ride this Taxi
                   </Text>
 
-                  <View style={tw`flex-row justify-center  w-full mt-5 mb-4`}>
+                  <View style={tw`flex-row justify-center  w-full mt-2 mb-4`}>
                     <Button
                       mode="contained"
                       onPress={() => console.log(joinList)}
+                      buttonColor="#FFD700" // Set a yellow color
+                      textColor="black" 
                     >
-                      Join Me!
+                      Confirm
                     </Button>
                   </View>
 
-                  <Button onPress={closeModal}>Close</Button>
+                  <Button onPress={closeModal}  textColor="black" >Close</Button>
                 </>
               )}
             </View>

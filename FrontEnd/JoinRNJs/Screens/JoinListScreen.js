@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, Modal } from "react-native";
 import { Button, Provider as PaperProvider } from "react-native-paper";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import {
   selectCurrentJoinReqId,
   selectJoinList,
@@ -21,11 +21,12 @@ const JoinListScreen = () => {
   const joinList = useSelector(selectJoinList);
   const userInfo = useSelector(selectUserInfo);
   const joinReqId = useSelector(selectCurrentJoinReqId);
+  const dispatch = useDispatch();
 
   const joinListdata = [];
   useEffect(() => {
     // Connect to the WebSocket with userInfo from Redux
-    WebSocketService.connect(userInfo);
+    WebSocketService.connect(userInfo,dispatch);
 
     return () => {
       WebSocketService.disconnect();

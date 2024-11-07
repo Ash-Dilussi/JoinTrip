@@ -19,12 +19,14 @@ import com.example.JoinGoREST.Model.Entity.JoinRequest;
 import com.example.JoinGoREST.Model.Entity.LongDistanceSegment;
 import com.example.JoinGoREST.Model.Entity.MasJoinList;
 import com.example.JoinGoREST.Model.Entity.Passenger;
+import com.example.JoinGoREST.Model.Entity.TaxiRequest;
 import com.example.JoinGoREST.Model.Enum.JoinReqStatus;
 import com.example.JoinGoREST.controllers.WebSocketController;
 import com.example.JoinGoREST.repo.JoinRequestRepo;
 import com.example.JoinGoREST.repo.LongDistanceSegmentsRepo;
 import com.example.JoinGoREST.repo.MasJoinListRepo;
 import com.example.JoinGoREST.repo.PassengerRepo;
+import com.example.JoinGoREST.repo.TaxiRequestRepo;
 import com.google.gson.Gson;
 
 
@@ -41,6 +43,8 @@ public class passengerServiece implements Ipassenger {
 	private MasJoinListRepo _maslistrepo; 
 	@Autowired
 	private LongDistanceSegmentsRepo _longSegrepo;
+	@Autowired
+	private TaxiRequestRepo _taxiRequestRepo;
 	@Autowired
 	private WebSocketController _webSocketController;
 
@@ -90,10 +94,15 @@ public class passengerServiece implements Ipassenger {
 				
 				 
 			}
-System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
-			_joinrequestrepo.insertPasReq(joinrequest.joinReqId, joinrequest.userId, joinrequest.desplace_id, joinrequest.startLon, joinrequest.startLat, joinrequest.destLon, joinrequest.destLat, joinrequest.requestStatus, joinrequest.reqVehicletype, joinrequest.getScheduleTimeinDate(), joinrequest.tripType, joinrequest.SegmentDistance);
+ 
+			_joinrequestrepo.insertPasReq(joinrequest.joinReqId, joinrequest.userId, joinrequest.desplace_id, (float)joinrequest.startLon, (float)joinrequest.startLat, (float)joinrequest.destLon, (float)joinrequest.destLat, joinrequest.requestStatus, joinrequest.reqVehicletype, joinrequest.getScheduleTimeinDate(), joinrequest.tripType, joinrequest.SegmentDistance);
 
-		
+		if(joinrequest.tripType == 1) {
+			joinrequest.setTaxiReqid(generateTaxiReqId(joinrequest.userId,(float)joinrequest.destLat));
+			TaxiRequest taxiReq  =new TaxiRequest(0,joinrequest.taxiReqid,joinrequest.startLat,joinrequest.startLon,joinrequest.destLat,joinrequest.destLon,joinrequest.joinReqId,joinrequest.desplace_id,joinrequest.reqVehicletype);
+			_taxiRequestRepo.save(taxiReq);
+			
+		}
 			
 			jointlsit= this.notifyJadeMAS(joinrequest);
 
@@ -129,7 +138,10 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 				while (response.getJoinList() == null || response.getJoinList().isEmpty()) {
 
 					//if ((System.currentTimeMillis() - startTime)% CHECK_INTERVAL  == 0) {
-					if(registration.tripType == 2) {
+					if(registration.tripType == 1) {
+						return new ResponsetoFrontDTO();
+					}
+					else if(registration.tripType == 2) {
 						
 					joindbresponse = _maslistrepo.matchcall(askingUser.joinReqId);
 					
@@ -141,14 +153,15 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 					
 					if(joindbresponse != null) {
 						List<ResponsePassengerDTO> tempJoinList = new ArrayList<>();
-
+						List<Passenger> res= new ArrayList<>();
 				
 							for(String ajoin: joindbresponse.getJoinlistReqid()) {
 
-								Passenger res = _passengerepo.getResponsePassforreqId(ajoin);
+								res = _passengerepo.getPassforreqId(ajoin);
+								for(Passenger user: res) {
 
-								tempJoinList.add(new ResponsePassengerDTO(res.getUserid(),res.getFirstName(),res.getLastName(),res.getPhone(),res.getGender(),res.getTown(),ajoin));
-
+								tempJoinList.add(new ResponsePassengerDTO(user.getUserid(),user.getFirstName(),user.getLastName(),user.getPhone(),user.getGender(),user.getTown(),ajoin));
+								}
 							}
 
 						response.setJoinReqId(askingUser.joinReqId);
@@ -193,6 +206,11 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 		long currentTimeMillis = System.currentTimeMillis();
 
 		return pasname +currentTimeMillis;
+	}
+	
+	private String generateTaxiReqId(String pasname, float des) {
+		
+		return pasname +"to"+des;
 	}
 
 
@@ -307,11 +325,14 @@ System.out.println("schedule time in date"+joinrequest.getScheduleTimeinDate());
 			joinmsgupdate.senderJoinReqId = JoinTripReqId;
 			
 			joinmsgupdate.reqStatus = JoinReqStatus.Accept;
+			List<Passenger> res= new ArrayList<>();
 					
 			for(String ajoin: joindbresponse.getJoinlistReqid()) {
-			
-				Passenger res = _passengerepo.getResponsePassforreqId(ajoin);
-				_webSocketController.sendRideRequestToPassenger(joinmsgupdate, res.getUserid());
+				
+				 res = _passengerepo.getPassforreqId(ajoin);
+				for(Passenger user: res) {
+				_webSocketController.sendRideRequestToPassenger(joinmsgupdate, user.getUserid());
+				}
 			}
 		}
 		}

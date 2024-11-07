@@ -1,5 +1,5 @@
 import React from 'react'
-import { FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {  View } from 'react-native'
 
 import tw from 'twrnc';
 import Map from '../Components/Map';

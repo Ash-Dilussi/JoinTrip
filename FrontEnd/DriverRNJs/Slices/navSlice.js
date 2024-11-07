@@ -29,6 +29,6 @@ export const { setCurrentLocation, setUserInfo, addTripreqList, clearTripreqList
 
 export const selectCurrentLocation = (state) => state.nav.currentLocation;
 export const selectUserInfo = (state) => state.nav.userInfo;
-export const selectTripreqList = (state) => state.nav.userInfo; 
+export const selectTripreqList = (state) => state.nav.tripreqList; 
 
 export default navSlice.reducer;

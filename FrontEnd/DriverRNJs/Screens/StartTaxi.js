@@ -20,11 +20,12 @@ const StartTaxi = ({ navigation }) => {
 
   /** @type {Coordinate[]} */
   const coordinatesArray = [
-    { lat: 6.927343251759639, lng: 79.84430490676255 },
-    { lat: 6.900629740590389, lng: 79.85336400307693 },
+    { lat: 6.927343251759639, lng: 79.84430490676255 },//OGF
+    { lat:  6.899843493436574, lng:  79.85148027253149 },//Kollu
     { lat: 6.817345778234778, lng: 79.88976761288893 },
   ];
-
+ 
+   
   const [locValue, setLocValue] = useState("0");
 
   const setCurrentLocationLatLng = (newValue) => {
@@ -42,17 +43,12 @@ const StartTaxi = ({ navigation }) => {
       default:
         break;
     }
-    console.log(coordinatesArray[locValue].lng);
+    
    
   };
 
   const handleSubmit = () => {
-    // Handle the submit action here
-    console.log("Form submitted:", {
-      headingHome: checked,
-      selectedLocation: coordinatesArray[locValue].lng,
-    });
-
+     
     sendRouteToBackend();
   };
 

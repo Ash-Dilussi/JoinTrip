@@ -1,9 +1,8 @@
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { WEBSOCKET_URL } from "@env";
-import { useDispatch, useSelector } from "react-redux";
-import {} from "../slices/navSlice";
+import { WEBSOCKET_URL } from "@env"; 
+import {addTaxiLocation} from "../slices/navSlice";
  
 // Polyfill for TextDecoder and TextEncoder in React Native
 if (typeof global.TextDecoder === 'undefined') {
@@ -18,24 +17,47 @@ class WebSocketService {
   constructor() {
     this.stompClient = null;
     this.privateStompClient = null;
-
+    
   }
 
   // Connect to the WebSocket and set up subscriptions
-  connect(userInfo) {
+  connect(userInfo,dispatch) {
     const socket = new SockJS(WEBSOCKET_URL);
     try {
       this.stompClient = new Client({
         webSocketFactory: () => socket,
         debug: (str) => console.log("11",str, socket.url),
         onConnect: () => {
-         
+      
+
           this.stompClient.subscribe(
             `/specific/passenger/requests/${userInfo.primaryUserInfo.userid}`,
             (message) => {
-              // const parsedMessage = JSON.parse(message.body);
-              console.log("parsedMessage:" ,message.body);
+              if (message && message.body) { 
+                const parsedMessage = JSON.parse(message.body); 
+
+                console.log("Parsed :", parsedMessage.currentLat);
+              }
             }
+          );
+          this.stompClient.subscribe(
+            `/specific/passenger/driverInfo/${userInfo.primaryUserInfo.userid}`,
+           
+              // const parsedMessage = JSON.parse(message.body);
+              (message) => {
+                if (message && message.body) { 
+                  const parsedMessage = JSON.parse(message.body); 
+            
+                  console.log("Parsed :", parsedMessage.currentLat);
+                  dispatch (addTaxiLocation({
+                    lat:parsedMessage.currentLat,
+                    lng:parsedMessage.currentLon,
+                  }))
+                
+
+
+                } 
+              }
           );
         },  
          onStompError: (error) => {
@@ -45,7 +67,7 @@ class WebSocketService {
           console.log("Disconnected from WebSocket");
         }, // Connection error handler
      
-        reconnectDelay: 100, // Reconnect if disconnected: delay
+        reconnectDelay: 500, // Reconnect if disconnected: delay
       });
 
       this.stompClient.activate();

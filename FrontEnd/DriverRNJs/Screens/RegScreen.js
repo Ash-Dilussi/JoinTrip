@@ -44,7 +44,7 @@ const RegScreen = ({ navigation }) => {
         phone: phone,
       })
     );
-    console.log(userid);
+    console.log(userid+" : "+vehicleType);
     navigation.navigate("StartTaxi");
   };
 
@@ -57,8 +57,8 @@ const RegScreen = ({ navigation }) => {
           label="Driver Name"
           value={driverName}
           onChangeText={setDriverName}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`} // Container styles for visibility
-          inputStyles={tw`h-12`} // Set a height for the input
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`} 
+          inputStyles={tw`h-12`}  
           labelStyles={tw`text-gray-600`} // Customize label styles if needed
         />
 
@@ -66,8 +66,8 @@ const RegScreen = ({ navigation }) => {
           label="Phone"
           value={phone}
           onChangeText={setPhone}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`} // Container styles for visibility
-          inputStyles={tw`h-12`} // Set a height for the input
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}  
+          inputStyles={tw`h-12`}  
           labelStyles={tw`text-gray-600`} // Customize label styles if needed
         />
 
@@ -75,24 +75,24 @@ const RegScreen = ({ navigation }) => {
           label="NIC"
           value={nic}
           onChangeText={setNic}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`} // Container styles for visibility
-          inputStyles={tw`h-12`} // Set a height for the input
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}  
+          inputStyles={tw`h-12`}  
           labelStyles={tw`text-gray-600`} // Customize label styles if needed
         />
         <FloatingLabelInput
           label="Address Line 1"
           value={addressLine1}
           onChangeText={setAddressLine1}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`} // Container styles for visibility
-          inputStyles={tw`h-12`} // Set a height for the input
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}  
+          inputStyles={tw`h-12`}  
           labelStyles={tw`text-gray-600`} // Customize label styles if needed
         />
         <FloatingLabelInput
           label="Address Line 2"
           value={addressLine2}
           onChangeText={setAddressLine2}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`} // Container styles for visibility
-          inputStyles={tw`h-12`} // Set a height for the input
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`} 
+          inputStyles={tw`h-12`} 
           labelStyles={tw`text-gray-600`} // Customize label styles if needed
         />
         <FloatingLabelInput
@@ -126,49 +126,7 @@ const RegScreen = ({ navigation }) => {
         </RadioButton.Group>
       </View>
 
-      {/* <TextInput
-        placeholder="Driver Name"
-        value={driverName}
-        onChangeText={setDriverName}
-        style={tw`w-full p-3 bg-white rounded mb-3 border border-gray-300`}
-      /> */}
-
-      {/* <TextInput
-        placeholder="Phone"
-        value={phone}
-        onChangeText={setPhone}
-        style={tw`w-full p-3 bg-white rounded mb-3 border border-gray-300`}
-        keyboardType="phone-pad"
-      /> */}
-
-      {/* <TextInput
-        placeholder="NIC"
-        value={nic}
-        onChangeText={setNic}
-        style={tw`w-full p-3 bg-white rounded mb-3 border border-gray-300`}
-      /> */}
-
-      {/* <TextInput
-        placeholder="Address Line 1"
-        value={addressLine1}
-        onChangeText={setAddressLine1}
-        style={tw`w-full p-3 bg-white rounded mb-3 border border-gray-300`}
-      />
-
-      <TextInput
-        placeholder="Address Line 2"
-        value={addressLine2}
-        onChangeText={setAddressLine2}
-        style={tw`w-full p-3 bg-white rounded mb-3 border border-gray-300`}
-      />
-
-      <TextInput
-        placeholder="Home Town"
-        value={homeTown}
-        onChangeText={setHomeTown}
-        style={tw`w-full p-3 bg-white rounded mb-3 border border-gray-300`}
-      /> */}
-
+        
       <TouchableOpacity
         onPress={handleRegister}
         style={tw`w-full p-3 bg-blue-500 rounded mt-5`}

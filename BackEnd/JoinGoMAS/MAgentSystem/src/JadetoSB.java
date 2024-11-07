@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
+import DTO.ResDriverMatch;
 import DTO.ResJoinMachListDTO;
 import DTO.longrouteSegmentDTO;
 import jade.core.Agent;
@@ -55,6 +56,9 @@ public class JadetoSB extends Agent {
 			MessageTemplate fromPassengerFarRouteTemplate = MessageTemplate.MatchConversationId("fromPassengerLongroutSegs");
 			ACLMessage fromPassengerFarRoutemsg = receive(fromPassengerFarRouteTemplate);
  
+			MessageTemplate fromDriverRideMatchTemplate = MessageTemplate.MatchConversationId("fromDriverRideMatch");
+			ACLMessage fromDriverRideMatchmsg = receive(fromDriverRideMatchTemplate);
+ 
 
 			if (fromPassengerJoinListmsg != null) {
 
@@ -76,7 +80,7 @@ public class JadetoSB extends Agent {
 				} 
 			}
 			
-			if(fromPassengerFarRoutemsg != null) {
+			else if(fromPassengerFarRoutemsg != null) {
 				
 				
 				try {
@@ -84,6 +88,22 @@ public class JadetoSB extends Agent {
 	 
 					 
 					List<longrouteSegmentDTO> messageOBjectContent = (List<longrouteSegmentDTO>) fromPassengerJoinListmsg.getContentObject();
+					
+					String jsonInputString = gson.toJson(messageOBjectContent);
+					sendJoinlistToSpringBoot(jsonInputString, reddUrl);
+					 
+				 } catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+			else if(fromDriverRideMatchmsg != null) {
+				
+				
+				try {
+					String reddUrl = BASE_API_URL +"/driver/masReponseTaxiMatch";
+	 
+					 
+					ResDriverMatch messageOBjectContent = (ResDriverMatch) fromDriverRideMatchmsg.getContentObject();
 					
 					String jsonInputString = gson.toJson(messageOBjectContent);
 					sendJoinlistToSpringBoot(jsonInputString, reddUrl);

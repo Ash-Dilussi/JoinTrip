@@ -20,11 +20,12 @@ public class TaxiRequest{
 	@GeneratedValue(strategy=GenerationType.AUTO) 
 	private Integer Id;
 	private String taxiReqid;
-	private String Drivername; 
-	private float startLat=0;
-	private float startLon=0;
-	private float destLat=0;
-	private float destLon=0;
+	 
+	private double startLat=0;
+	private double startLon=0;
+	private double destLat=0;
+	private double destLon=0;
 	private String JoinReqid;
+	public String destinationName;
 	private int vehicletype; 
 }

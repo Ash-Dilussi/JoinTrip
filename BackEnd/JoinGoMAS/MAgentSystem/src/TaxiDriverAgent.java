@@ -19,7 +19,7 @@ import jade.lang.acl.MessageTemplate;
 public class TaxiDriverAgent extends Agent{
 
 	private TaxiStatusDTO driverData = new TaxiStatusDTO();
-	private static int closeradius = 5;
+	private static int closeradius = 10;
 	private static int homecloseradius = 10;
 
 
@@ -42,6 +42,7 @@ public class TaxiDriverAgent extends Agent{
 
 
 		addBehaviour(new DriverStatisUpdates());
+		addBehaviour(new lookingfoTripCalls());
 
 	}
 
@@ -70,7 +71,7 @@ public class TaxiDriverAgent extends Agent{
 		@Override
 		public void action() {
 			
-			final String[] passTypes = {"longtrippassenger"};
+			final String[] passTypes = {"longtrippassenger","taxiReqpassenger"};
 			
 			for(String pasnger:passTypes) {
 				
@@ -178,6 +179,7 @@ public class TaxiDriverAgent extends Agent{
 			try {
 
 				if(tripCallMsg !=null) {
+					System.out.println("taxi ride match");
 					TaxiRequestDTO taxiCall = (TaxiRequestDTO) tripCallMsg.getContentObject();
 					double distance = haversine(driverData.getCurrentLat(), driverData.getCurrentLon(), taxiCall.startLat, taxiCall.startLon);
 					if(distance <= closeradius && taxiCall.vehicletype == driverData.getVehicletype()) {
@@ -186,8 +188,8 @@ public class TaxiDriverAgent extends Agent{
 						if(driverData.getHeadingLat() == 0 && driverData.getHeadingLon() == 0) {
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-							msg.setConversationId("fromJadetoSB");   
-							msg.setContent("DriverAboutMatch");
+							msg.setConversationId("fromDriverRideMatch");   
+							 
 							
 							ResDriverMatch driveMatchList = new ResDriverMatch();
 							driveMatchList.setTaxiStatust(driverData);
@@ -201,8 +203,8 @@ public class TaxiDriverAgent extends Agent{
 							if(enddistance <= homecloseradius) {
 								ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-								msg.setConversationId("fromJadetoSB");   
-								msg.setContent("DriverAboutMatch");
+								msg.setConversationId("fromDriverRideMatch");   
+								 
 								
 								ResDriverMatch driveMatchList = new ResDriverMatch();
 								driveMatchList.setTaxiStatust(driverData);
@@ -216,6 +218,8 @@ public class TaxiDriverAgent extends Agent{
 						}
 
 					}
+				}else {
+					block();
 				}
 
 			}

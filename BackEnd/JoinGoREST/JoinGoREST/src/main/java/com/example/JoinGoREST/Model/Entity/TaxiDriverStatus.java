@@ -22,10 +22,10 @@ public class TaxiDriverStatus{
 	private Integer Id;
 	private String driverid;
 	private String Drivername;
-	private float currentLon=0;
-	private float currentLat=0;
-	private float headingLat=0;
-	private float headingLon=0; 
+	private double currentLon=0;
+	private double currentLat=0;
+	private double headingLat=0;
+	private double headingLon=0; 
 	private int vehicletype;
 	private int taxiStatus;
 	private int onService=1;

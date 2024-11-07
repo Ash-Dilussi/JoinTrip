@@ -1,15 +1,17 @@
 package DTO;
 
-public class TaxiRequestDTO{
+import jade.util.leap.Serializable;
+
+public class TaxiRequestDTO implements Serializable{
 
 
 	public Integer Id;
 	public String taxiReqid;
   
-	public float startLat=0;
-	public float startLon=0;
-	public float destLat=0;
-	public float destLon=0;
+	public double startLat=0;
+	public double startLon=0;
+	public double destLat=0;
+	public double destLon=0;
 	public String JoinReqid;
 	public String destinationName;
 	public int vehicletype; 

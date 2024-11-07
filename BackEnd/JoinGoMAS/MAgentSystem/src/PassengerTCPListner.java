@@ -101,7 +101,10 @@ public class PassengerTCPListner extends Agent {
 				AgentContainer container = getContainerController();
 
 				Object[] args = new Object[] { passenger };
-				if(passenger.getTripType() == 2) {
+				if(passenger.getTripType() == 1) {
+					AgentController taxipassengerAgent = container.createNewAgent(passenger.getJoinReqId(), TaxiRequestPassenger.class.getName(), args);
+					taxipassengerAgent.start();
+				}else if(passenger.getTripType() == 2) {
 					AgentController passengerAgent = container.createNewAgent(passenger.getJoinReqId(), PassengerAgent.class.getName(), args);
 					passengerAgent.start();
 				}else if(passenger.getTripType() == 4){

@@ -13,8 +13,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 
-		registry.addEndpoint("/joinGoSB").setAllowedOrigins("*").withSockJS();
-
+		registry.addEndpoint("/joinGoSB").setAllowedOrigins("http://10.0.2.2:8080", "http://localhost:8080").withSockJS();
+		//.setAllowedOriginPatterns("*")
 	}
 
 	@Override
@@ -23,4 +23,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 		config.setApplicationDestinationPrefixes("/joinGoapp");// Prefix for messages from client to server
 	}
 
+	//.setHeartbeatValue(new long[]{10000, 10000})
 }
