@@ -6,6 +6,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import com.example.JoinGoREST.Model.DTO.ResDriverMatchDTO;
+import com.example.JoinGoREST.Model.DTO.ResponsePassengerDTO;
 import com.example.JoinGoREST.Model.DTO.JoinReqMsgDTO;
 import com.example.JoinGoREST.Model.DTO.JoinRequestDTO;
 import com.example.JoinGoREST.Model.Entity.TaxiDriverStatus;
@@ -24,6 +25,11 @@ public class WebSocketController {
 	public void sendRideRequestToPassenger(JoinReqMsgDTO request, String userId) {
 		System.out.println("To the Mbile: "+userId);
 		messagingTemplate.convertAndSend("/specific/passenger/requests/"+ userId, request);
+	}
+	
+	public void sendJoinListToPassenger(ResponsePassengerDTO listItem, String userId) {
+		System.out.println("To the Mbile: "+userId);
+		messagingTemplate.convertAndSend("/specific/passenger/joinList/"+ userId, listItem);
 	}
 
 	// Send new ride notifications to passengers

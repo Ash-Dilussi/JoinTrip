@@ -137,7 +137,7 @@ public class TaxiDriverAgent extends Agent{
 						driverData.setTaxiStatus(driverStatUpdate.getTaxiStatus());
 						if(driverData.getTaxiStatus() == 0) {
 
-							DFService.deregister(myAgent);
+							takedown();
 
 						}else if(driverData.getTaxiStatus() ==1) {
 							registerWithDF();
@@ -164,7 +164,15 @@ public class TaxiDriverAgent extends Agent{
 
 
 	}
-
+	private void takedown() {
+	      try {
+	            // Ensure the agent is deregistered from the DF before termination
+	            DFService.deregister(this);
+	          
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	}
 
 
 	class lookingfoTripCalls extends CyclicBehaviour{

@@ -33,7 +33,7 @@ const Map = () => {
   const taxiLocation = useSelector(selectTaxiLocation);
 
   useEffect(() => {
-     
+    setTaxiRiderListData([])
     const updatedTaxiData = taxiLocation.map((item, index) => ({
         ...item,
         id: index+1,

@@ -24,6 +24,7 @@ import com.example.JoinGoREST.Model.Entity.JoinRequest;
 import com.example.JoinGoREST.Model.Entity.LongDistanceSegment;
 import com.example.JoinGoREST.Model.Entity.MasJoinList;
 import com.example.JoinGoREST.Model.Entity.Passenger;
+import com.example.JoinGoREST.Model.Entity.TaxiRequest;
 import com.example.JoinGoREST.service.Ipassenger;
 
 @RestController
@@ -62,7 +63,7 @@ public class PassengerController {
 	}
 
 	@PostMapping("/createRideRequest")
-	public CompletableFuture<ResponsetoFrontDTO> createRideRequest(@RequestBody JoinRequestDTO joinrequest){
+	public String createRideRequest(@RequestBody JoinRequestDTO joinrequest){
 		try { 
  
 		System.out.println("hit to createRideRequest:   ");
@@ -108,6 +109,19 @@ public class PassengerController {
 			 System.out.println("front msg :"+ msgJoin.receiverUserId);  
 
 			return _passenger.joinMsgManager(msgJoin);
+
+		}catch(Exception ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad match reponse"+ ex);
+		}
+	}
+	
+	@PostMapping("/longDistanceTaxiReqfromMAS")
+	public String  LongDistanceTaxiReqfromMAS(@RequestBody TaxiRequest msgLong) {
+		try { 
+
+			 System.out.println("Long distance from MAS :"+ msgLong.getTaxiReqid());  
+
+			return _passenger.longDisTaxiReq(msgLong);
 
 		}catch(Exception ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad match reponse"+ ex);

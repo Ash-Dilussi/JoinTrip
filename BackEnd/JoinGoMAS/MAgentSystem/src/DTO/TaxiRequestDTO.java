@@ -15,4 +15,5 @@ public class TaxiRequestDTO implements Serializable{
 	public String JoinReqid;
 	public String destinationName;
 	public int vehicletype; 
+	public int tripType=0;
 }

@@ -77,7 +77,8 @@ public class TaxiRequestPassenger extends Agent{
 		protected void onTick() {
 			long elapsedTime = System.currentTimeMillis() - startTime; 
 			if (elapsedTime >= TIME_LIMIT) { 
-System.out.println("taxi  req Agetn terminating");
+System.out.println("taxi  req Agetn terminating: "+getAID().getLocalName() );
+takedown();
 				doDelete();
 
 			}
@@ -85,7 +86,15 @@ System.out.println("taxi  req Agetn terminating");
 		}
 	}
 		
-	
+	private void takedown() {
+	      try {
+	            // Ensure the agent is deregistered from the DF before termination
+	            DFService.deregister(this);
+	          
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	}
 class firsttoDriverBroadcast extends OneShotBehaviour{
 		
 		@Override
@@ -113,6 +122,7 @@ class firsttoDriverBroadcast extends OneShotBehaviour{
 	  toTaxi.destLat =  passengerData.getDestLat();
 	  toTaxi.destLon =  passengerData.getDestLon();
 	  toTaxi.destinationName = passengerData.getDesplace_id();
+	  toTaxi.tripType = passengerData.getTripType();
 				  
 							ACLMessage msgnewalert = new ACLMessage(ACLMessage.INFORM); 
 							msgnewalert.addReceiver(dfAgent.getName());

@@ -172,19 +172,16 @@ const SelectOptionCard = ({ navigation }) => {
       dispatch(clearJoinList());
       clearJoinList;
 
-      if (response.data) {
+      if (response) {
         //console.log("Got a Response:", response.data);
         if (apiridetype == 1) {
 
           navigation.navigate("RidersViewScreen");
         } else if (apiridetype == 2) {
-          const itemsArray = response.data.joinList;
-          dispatch(setCurrentJoinReqId(response.data.joinReqId));
-          if (itemsArray) {
-            itemsArray.forEach((item) => {
-              dispatch(addJoinList(item));
-            });
-          }
+          navigation.navigate("JoinListScreen");
+           
+          dispatch(setCurrentJoinReqId(response.data));
+          
 
           navigation.navigate("JoinListScreen");
         } else if (apiridetype == 3) {

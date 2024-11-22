@@ -4,6 +4,7 @@ const initialState = {
   currentLocation: null,
   userInfo: null,
   tripreqList: [],
+  driverHomeTown: null,
 };
 
 export const navSlice = createSlice({
@@ -16,6 +17,9 @@ export const navSlice = createSlice({
     setUserInfo: (state, action) => {
       state.userInfo = action.payload;
     },
+    setDriverHomeTown: (state, action) => {
+      state.driverHomeTown = action.payload;
+    },
     addTripreqList: (state, action) => {
       state.tripreqList.push(action.payload);
     },
@@ -25,10 +29,11 @@ export const navSlice = createSlice({
   },
 });
 
-export const { setCurrentLocation, setUserInfo, addTripreqList, clearTripreqList} = navSlice.actions;
+export const { setCurrentLocation, setUserInfo, addTripreqList, clearTripreqList,setDriverHomeTown} = navSlice.actions;
 
 export const selectCurrentLocation = (state) => state.nav.currentLocation;
 export const selectUserInfo = (state) => state.nav.userInfo;
 export const selectTripreqList = (state) => state.nav.tripreqList; 
+export const selectDriverHomeTown = (state) => state.nav.driverHomeTown; 
 
 export default navSlice.reducer;

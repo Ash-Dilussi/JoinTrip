@@ -24,7 +24,7 @@ public class JoinRequestDTO {
 	public double startLat =0;
 	public double destLon =0;
 	public double destLat =0;
-	 
+	
 	 
 	public int requestStatus =0;
 	public int reqVehicletype=0;
@@ -38,6 +38,8 @@ public class JoinRequestDTO {
 	public Passenger userInfo ;
 	
 	public String taxiReqid;
+ 
+	
 	
 	public  Date getScheduleTimeinDate() {
 		System.out.println(scheduleTime);

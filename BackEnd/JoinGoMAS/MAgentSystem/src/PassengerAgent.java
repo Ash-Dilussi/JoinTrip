@@ -307,29 +307,29 @@ public class PassengerAgent extends Agent {
 						System.out.println(getLocalName()+" : Join match to: " + joinpassdataMsg.getSender().getLocalName());
 
 						joinCompaitbleList.add(comparePassenger);
+						
+
+							try { 
+								ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
+
+								ResJoinMachListDTO listToSB = new ResJoinMachListDTO();
+								listToSB.setCurrentPassenger(passengerData);
+								listToSB.setJoinPassengerList(joinCompaitbleList);
+								
+								msg.setConversationId("fromPassengerJoinList");   
+								msg.setContentObject((Serializable) listToSB); 
+								msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
+								send(msg);
+
+								joinCompaitbleList.clear();
+							} catch (java.io.IOException e) {
+								e.printStackTrace();
+							}
+
+						
 					}
 
-					if(joinCompaitbleList.size()%3 == 0) {
-
-
-						try { 
-							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
-
-							ResJoinMachListDTO listToSB = new ResJoinMachListDTO();
-							listToSB.setCurrentPassenger(passengerData);
-							listToSB.setJoinPassengerList(joinCompaitbleList);
-							
-							msg.setConversationId("fromPassengerJoinList");   
-							msg.setContentObject((Serializable) listToSB); 
-							msg.addReceiver(new AID("Jade2SBAgent", AID.ISLOCALNAME)); 
-							send(msg);
-
-							joinCompaitbleList.clear();
-						} catch (java.io.IOException e) {
-							e.printStackTrace();
-						}
-
-					}
+					
 
 				} catch (UnreadableException e) { 
 					e.printStackTrace();
