@@ -20,10 +20,10 @@ public class JoinRequestDTO {
 	public String userId; 
 	public String joinReqId;
 	public String desplace_id;
-	public double startLon =0;
-	public double startLat =0;
-	public double destLon =0;
-	public double destLat =0;
+	public double startLon ;
+	public double startLat ;
+	public double destLon ;
+	public double destLat ;
 	
 	 
 	public int requestStatus =0;

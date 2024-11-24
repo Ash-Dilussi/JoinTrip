@@ -86,23 +86,8 @@ const RegScreen = ({ navigation }) => {
           inputStyles={tw`h-12`}
           labelStyles={tw`text-gray-600`} // Customize label styles if needed
         />
-        <FloatingLabelInput
-          label="Address Line 1"
-          value={addressLine1}
-          onChangeText={setAddressLine1}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}
-          inputStyles={tw`h-12`}
-          labelStyles={tw`text-gray-600`} // Customize label styles if needed
-        />
-        <FloatingLabelInput
-          label="Address Line 2"
-          value={addressLine2}
-          onChangeText={setAddressLine2}
-          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}
-          inputStyles={tw`h-12`}
-          labelStyles={tw`text-gray-600`} // Customize label styles if needed
-        />
-        <View style={tw`mt-4 mb-5`}>
+
+<View style={tw`mt-4 mb-5`}>
           <GooglePlacesAutocomplete
             styles={{
               container: { flex: 0 ,   borderWidth: 1,  borderColor: '#ccc',    borderRadius: 8, },
@@ -130,6 +115,24 @@ const RegScreen = ({ navigation }) => {
             debounce={400}
           />
         </View>
+        
+        <FloatingLabelInput
+          label="Address Line 1"
+          value={addressLine1}
+          onChangeText={setAddressLine1}
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}
+          inputStyles={tw`h-12`}
+          labelStyles={tw`text-gray-600`} // Customize label styles if needed
+        />
+        <FloatingLabelInput
+          label="Address Line 2"
+          value={addressLine2}
+          onChangeText={setAddressLine2}
+          containerStyle={tw`border border-gray-300 rounded-md p-2 mb-4`}
+          inputStyles={tw`h-12`}
+          labelStyles={tw`text-gray-600`} // Customize label styles if needed
+        />
+        
       </View>
 
       <Text style={tw`text-lg mb-2`}>Vehicle Type:</Text>

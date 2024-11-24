@@ -175,19 +175,20 @@ const SelectOptionCard = ({ navigation }) => {
       if (response) {
         //console.log("Got a Response:", response.data);
         if (apiridetype == 1) {
-
-          navigation.navigate("RidersViewScreen");
-        } else if (apiridetype == 2) {
-          navigation.navigate("JoinListScreen");
-           
           dispatch(setCurrentJoinReqId(response.data));
-          
+          navigation.navigate("RidersViewScreen");
 
+        } else if (apiridetype == 2) {
+          dispatch(setCurrentJoinReqId(response.data));
           navigation.navigate("JoinListScreen");
+
         } else if (apiridetype == 3) {
-          const itemsArray = response.data.farRouteSegs;
-          console.log(itemsArray);
+          dispatch(setCurrentJoinReqId(response.data));
+          console.log(response.data);
+          navigation.navigate("RidersViewScreen");
+
         } else if (apiridetype == 4) {
+          dispatch(setCurrentJoinReqId(response.data));
           navigation.navigate("ScheduleScreen");
         }
       } else {

@@ -26,10 +26,12 @@ const StartTaxi = ({ navigation }) => {
 
   /** @type {Coordinate[]} */
   const coordinatesArray = [
-    { lat: 6.927343251759639, lng: 79.84430490676255 }, //OGF
     { lat: 6.899843493436574, lng: 79.85148027253149 }, //Kollu
-    { lat: 6.817345778234778, lng: 79.88976761288893 },
+    { lat: 6.812649517417522, lng: 79.881361000105 }, //Kandawala junc 
+    { lat: 6.83526443806011, lng:79.8676024580842 },// mount
   ];
+
+  
 
   const [locValue, setLocValue] = useState("0");
 
@@ -107,15 +109,15 @@ const StartTaxi = ({ navigation }) => {
         >
           <View style={tw`flex-row items-center mb-2`}>
             <RadioButton value="A" color="#1D4ED8" />
-            <Text style={tw`ml-2 text-gray-800`}>Location A</Text>
+            <Text style={tw`ml-2 text-gray-800`}>Location A (Col-03)</Text>
           </View>
           <View style={tw`flex-row items-center mb-2`}>
             <RadioButton value="B" color="#1D4ED8" />
-            <Text style={tw`ml-2 text-gray-800`}>Location B</Text>
+            <Text style={tw`ml-2 text-gray-800`}>Location B (Kandawala junc.)</Text>
           </View>
           <View style={tw`flex-row items-center mb-2`}>
             <RadioButton value="C" color="#1D4ED8" />
-            <Text style={tw`ml-2 text-gray-800`}>Location C</Text>
+            <Text style={tw`ml-2 text-gray-800`}>Location C (Mnt. Lavinia)</Text>
           </View>
         </RadioButton.Group>
       </View>

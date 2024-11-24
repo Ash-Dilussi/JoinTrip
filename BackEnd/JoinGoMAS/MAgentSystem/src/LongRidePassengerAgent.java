@@ -27,8 +27,8 @@ public class LongRidePassengerAgent extends Agent {
 	private JoinRequestDTO passengerData = new JoinRequestDTO();
 	private List<Coordinate> fullLongRoute;
 	private int segmentdistance;
-	private List<longrouteSegmentDTO> longRouteSegments;
-	private List<TaxiRequestDTO> taxiRequestList;
+	private List<longrouteSegmentDTO> longRouteSegments= new ArrayList<>();;
+	private List<TaxiRequestDTO> taxiRequestList =new ArrayList<>();;
 
 	@Override
 	protected void setup() {
@@ -62,6 +62,8 @@ public class LongRidePassengerAgent extends Agent {
 
 		addBehaviour(new agentdeteTimer(this, TIME_LIMIT));
 		addBehaviour(new segmentRouteBehave(fullLongRoute, segmentdistance));
+		
+		
 
 		addBehaviour(new newtoDriverBroadcast());
 
@@ -147,12 +149,15 @@ public class LongRidePassengerAgent extends Agent {
 
 		public segmentRouteBehave(List<Coordinate> dafullroute, int distance) {
 			this.fullroute = dafullroute;
-			this.segdistance = distance;
+			this.segdistance = distance*100;
 
 		}
 
 		@Override
 		public void action() {
+			
+			
+			System.out.println("no of coords long distance: "+ this.fullroute.size());
 
 			List<longrouteSegmentDTO> segments = new ArrayList<>();
 
@@ -166,7 +171,7 @@ public class LongRidePassengerAgent extends Agent {
 			for (int i = 1; i < this.fullroute.size(); i++) {
 				Coordinate currentPoint = this.fullroute.get(i);
 				double distance = calculateDistance(segmentStart, currentPoint);
-
+		 
 				accumulatedDistance += distance;
 
 				if (accumulatedDistance >= this.segdistance) {
@@ -174,19 +179,22 @@ public class LongRidePassengerAgent extends Agent {
 					segments.add(
 							new longrouteSegmentDTO(passengerData.getJoinReqId(), count, segmentStart, currentPoint));
 
+					System.out.println("accumulate dis for seg long distance: "+ accumulatedDistance);
+					
 					// Reset for next segment
 					segmentStart = currentPoint;
 					accumulatedDistance = 0.0;
 					count++;
 				}
 			}
-
+		
 			// if any remaining coordinates for final segment
 			if (accumulatedDistance > 0 && !segments.isEmpty()) {
 				segments.add(new longrouteSegmentDTO(passengerData.getJoinReqId(), count, segmentStart,
 						this.fullroute.get(this.fullroute.size() - 1)));
 			}
-
+			System.out.println("no of segs long distance: "+ count);
+			System.out.println("accumulate dis after for seg long distance: "+ accumulatedDistance); 
 			longRouteSegments = segments;
 
 			if (!longRouteSegments.isEmpty()) {
@@ -203,10 +211,13 @@ public class LongRidePassengerAgent extends Agent {
 						toTaxi.startLon = (float) asegment.getStart().getLongitude();
 						toTaxi.destLat = (float) asegment.getEnd().getLatitude();
 						toTaxi.destLon = (float) asegment.getEnd().getLongitude();
+						toTaxi.destinationName =String.valueOf(asegment.getEnd().getLatitude())+ ", "+String.valueOf(asegment.getEnd().getLongitude());
 
 						taxiRequestList.add(toTaxi);
 
 					}
+					System.out.println("to taxi long distance: "+ taxiRequestList.get(0).taxiReqid);
+					
 
 					if (!taxiRequestList.isEmpty()) {
 

@@ -103,9 +103,18 @@ public class passengerServiece implements Ipassenger {
 				String toMAS = this.notifyJadeMAS2(joinrequest);
 
 				return joinReqId;
-			}
+			} else if (joinrequest.tripType == 3) {
+				this.notifyJadeMAS2(joinrequest);
 
-			jointlsit = this.notifyJadeMAS(joinrequest);
+				return joinReqId;
+			}else if (joinrequest.tripType == 4) {
+				this.notifyJadeMAS2(joinrequest);
+
+				return joinReqId;
+			}
+ 
+
+			return joinReqId;
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -312,7 +321,7 @@ public class passengerServiece implements Ipassenger {
 			forMASAgent.destLon = Destn1.longitude;
 			forMASAgent.taxiReqid = taxiReqid;
 			forMASAgent.desplace_id = destName;
-			forMASAgent.tripType = 2;
+			forMASAgent.tripType = 1;
 			forMASAgent.reqVehicletype = vehicleType;
 
 			String toMAS = notifyJadeMAS2(forMASAgent);
@@ -388,7 +397,6 @@ public class passengerServiece implements Ipassenger {
 
 		return "timer exec";
 	}
-
 
 	@Override
 	@Transactional

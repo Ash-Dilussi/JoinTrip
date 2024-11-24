@@ -191,7 +191,7 @@ public class TaxiDriverAgent extends Agent{
 					TaxiRequestDTO taxiCall = (TaxiRequestDTO) tripCallMsg.getContentObject();
 					double distance = haversine(driverData.getCurrentLat(), driverData.getCurrentLon(), taxiCall.startLat, taxiCall.startLon);
 					if(distance <= closeradius && taxiCall.vehicletype == driverData.getVehicletype()) {
-
+						System.out.println("taxi ride match");
 						//A latitude of 0 and a longitude of 0 (0, 0) points to a location in the Gulf of Guinea, off the coast of West Africa, which is often considered "ocean" rather than land.
 						if(driverData.getHeadingLat() == 0 && driverData.getHeadingLon() == 0) {
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
@@ -209,6 +209,7 @@ public class TaxiDriverAgent extends Agent{
 						}else {
 							double enddistance = haversine(driverData.getHeadingLat(), driverData.getHeadingLon(), taxiCall.destLat, taxiCall.destLon);
 							if(enddistance <= homecloseradius) {
+								System.out.println("taxi ride match");
 								ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
 								msg.setConversationId("fromDriverRideMatch");   

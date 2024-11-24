@@ -88,7 +88,7 @@ public class JadetoSB extends Agent {
 				try {
 					String reddUrl = BASE_API_URL + "/passenger/longDistanceTaxiReqfromMAS";
 
-					TaxiRequestDTO messageOBjectContent = (TaxiRequestDTO) fromPassengerJoinListmsg
+					TaxiRequestDTO messageOBjectContent = (TaxiRequestDTO) fromPassLongTaxiReqmsg
 							.getContentObject();
 
 					String jsonInputString = gson.toJson(messageOBjectContent);

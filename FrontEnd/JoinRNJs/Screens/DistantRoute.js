@@ -67,7 +67,7 @@ const DistantRoute = () => {
           text: tripdistance.text
         }))
     
-       // console.log('Distance in meters:', distance.value);
+       //console.log('Distance in meters:', tripdistance.text);
         
       } else {
         console.log('No route found');
@@ -76,6 +76,7 @@ const DistantRoute = () => {
       const points = decodePolyline(
         response.data.routes[0].overview_polyline.points
       );
+       
       setRoute(points);
       dispatch(
         setFarRoute({
