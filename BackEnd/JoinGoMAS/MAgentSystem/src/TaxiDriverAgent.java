@@ -19,7 +19,7 @@ import jade.lang.acl.MessageTemplate;
 public class TaxiDriverAgent extends Agent{
 
 	private TaxiStatusDTO driverData = new TaxiStatusDTO();
-	private static int closeradius = 5;
+	private static int closeradius = 10;
 	private static int homecloseradius = 10;
 
 
@@ -42,6 +42,7 @@ public class TaxiDriverAgent extends Agent{
 
 
 		addBehaviour(new DriverStatisUpdates());
+		addBehaviour(new lookingfoTripCalls());
 
 	}
 
@@ -70,7 +71,7 @@ public class TaxiDriverAgent extends Agent{
 		@Override
 		public void action() {
 			
-			final String[] passTypes = {"longtrippassenger"};
+			final String[] passTypes = {"longtrippassenger","taxiReqpassenger"};
 			
 			for(String pasnger:passTypes) {
 				
@@ -136,7 +137,7 @@ public class TaxiDriverAgent extends Agent{
 						driverData.setTaxiStatus(driverStatUpdate.getTaxiStatus());
 						if(driverData.getTaxiStatus() == 0) {
 
-							DFService.deregister(myAgent);
+							takedown();
 
 						}else if(driverData.getTaxiStatus() ==1) {
 							registerWithDF();
@@ -163,7 +164,15 @@ public class TaxiDriverAgent extends Agent{
 
 
 	}
-
+	private void takedown() {
+	      try {
+	            // Ensure the agent is deregistered from the DF before termination
+	            DFService.deregister(this);
+	          
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	}
 
 
 	class lookingfoTripCalls extends CyclicBehaviour{
@@ -178,16 +187,17 @@ public class TaxiDriverAgent extends Agent{
 			try {
 
 				if(tripCallMsg !=null) {
+					System.out.println("taxi ride match");
 					TaxiRequestDTO taxiCall = (TaxiRequestDTO) tripCallMsg.getContentObject();
 					double distance = haversine(driverData.getCurrentLat(), driverData.getCurrentLon(), taxiCall.startLat, taxiCall.startLon);
 					if(distance <= closeradius && taxiCall.vehicletype == driverData.getVehicletype()) {
-
+						System.out.println("taxi ride match");
 						//A latitude of 0 and a longitude of 0 (0, 0) points to a location in the Gulf of Guinea, off the coast of West Africa, which is often considered "ocean" rather than land.
 						if(driverData.getHeadingLat() == 0 && driverData.getHeadingLon() == 0) {
 							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-							msg.setConversationId("fromJadetoSB");   
-							msg.setContent("DriverAboutMatch");
+							msg.setConversationId("fromDriverRideMatch");   
+							 
 							
 							ResDriverMatch driveMatchList = new ResDriverMatch();
 							driveMatchList.setTaxiStatust(driverData);
@@ -199,10 +209,11 @@ public class TaxiDriverAgent extends Agent{
 						}else {
 							double enddistance = haversine(driverData.getHeadingLat(), driverData.getHeadingLon(), taxiCall.destLat, taxiCall.destLon);
 							if(enddistance <= homecloseradius) {
+								System.out.println("taxi ride match");
 								ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);  
 
-								msg.setConversationId("fromJadetoSB");   
-								msg.setContent("DriverAboutMatch");
+								msg.setConversationId("fromDriverRideMatch");   
+								 
 								
 								ResDriverMatch driveMatchList = new ResDriverMatch();
 								driveMatchList.setTaxiStatust(driverData);
@@ -216,6 +227,8 @@ public class TaxiDriverAgent extends Agent{
 						}
 
 					}
+				}else {
+					block();
 				}
 
 			}

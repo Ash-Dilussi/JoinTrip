@@ -9,7 +9,9 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
+import DTO.ResDriverMatch;
 import DTO.ResJoinMachListDTO;
+import DTO.TaxiRequestDTO;
 import DTO.longrouteSegmentDTO;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -35,11 +37,13 @@ public class JadetoSB extends Agent {
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		System.out.println(getAID().getLocalName()+" : JadetoSB agent created.");
+		System.out.println(getAID().getLocalName() + " : JadetoSB agent created.");
+		
 		addBehaviour(new JadetoSB.WaitformsgBehaviour());
 	}
 
-
+	
+	
 	class WaitformsgBehaviour extends CyclicBehaviour {
 		private final Gson gson = new Gson();
 		private final String BASE_API_URL = "http://localhost:8080/api/v1";
@@ -47,66 +51,74 @@ public class JadetoSB extends Agent {
 		@Override
 		public void action() {
 
-			
-			
-			MessageTemplate fromPassengerJoinListTemplate = MessageTemplate.MatchConversationId("fromPassengerJoinList");
+			MessageTemplate fromPassengerJoinListTemplate = MessageTemplate
+					.MatchConversationId("fromPassengerJoinList");
 			ACLMessage fromPassengerJoinListmsg = receive(fromPassengerJoinListTemplate);
 
-			MessageTemplate fromPassengerFarRouteTemplate = MessageTemplate.MatchConversationId("fromPassengerLongroutSegs");
-			ACLMessage fromPassengerFarRoutemsg = receive(fromPassengerFarRouteTemplate);
- 
+			MessageTemplate fromPassLongTaxiReqTemplate = MessageTemplate
+					.MatchConversationId("fromPassLongTaxiReq");
+			ACLMessage fromPassLongTaxiReqmsg = receive(fromPassLongTaxiReqTemplate);
+
+			MessageTemplate fromDriverRideMatchTemplate = MessageTemplate.MatchConversationId("fromDriverRideMatch");
+			ACLMessage fromDriverRideMatchmsg = receive(fromDriverRideMatchTemplate);
 
 			if (fromPassengerJoinListmsg != null) {
 
-			//	System.out.println("Message content: '" + fromPassengerJoinListmsg.getContent() + "'");
+				// System.out.println("Message content: '" +
+				// fromPassengerJoinListmsg.getContent() + "'");
 
 				try {
-					String reddUrl = BASE_API_URL +"/passenger/masReponseJoin";
-	  
-					 
-					//	reddUrl = BASE_API_URL +"/driver/masReponseJoin";
-					  
-					ResJoinMachListDTO messageOBjectContent = (ResJoinMachListDTO) fromPassengerJoinListmsg.getContentObject();
-					
+					String reddUrl = BASE_API_URL + "/passenger/masReponseJoin";
+
+					// reddUrl = BASE_API_URL +"/driver/masReponseJoin";
+
+					ResJoinMachListDTO messageOBjectContent = (ResJoinMachListDTO) fromPassengerJoinListmsg
+							.getContentObject();
+
 					String jsonInputString = gson.toJson(messageOBjectContent);
 					sendJoinlistToSpringBoot(jsonInputString, reddUrl);
-					 
-				 } catch (Exception e) {
-					throw new RuntimeException(e);
-				} 
-			}
-			
-			if(fromPassengerFarRoutemsg != null) {
-				
-				
-				try {
-					String reddUrl = BASE_API_URL +"/passenger/masReponseFarRoute";
-	 
-					 
-					List<longrouteSegmentDTO> messageOBjectContent = (List<longrouteSegmentDTO>) fromPassengerJoinListmsg.getContentObject();
-					
-					String jsonInputString = gson.toJson(messageOBjectContent);
-					sendJoinlistToSpringBoot(jsonInputString, reddUrl);
-					 
-				 } catch (Exception e) {
+
+				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-				else {
-				block();	
+
+			else if (fromPassLongTaxiReqmsg != null) {
+
+				try {
+					String reddUrl = BASE_API_URL + "/passenger/longDistanceTaxiReqfromMAS";
+
+					TaxiRequestDTO messageOBjectContent = (TaxiRequestDTO) fromPassLongTaxiReqmsg
+							.getContentObject();
+
+					String jsonInputString = gson.toJson(messageOBjectContent);
+					sendJoinlistToSpringBoot(jsonInputString, reddUrl);
+
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			} else if (fromDriverRideMatchmsg != null) {
+
+				try {
+					String reddUrl = BASE_API_URL + "/driver/masReponseTaxiMatch";
+
+					ResDriverMatch messageOBjectContent = (ResDriverMatch) fromDriverRideMatchmsg.getContentObject();
+
+					String jsonInputString = gson.toJson(messageOBjectContent);
+					sendJoinlistToSpringBoot(jsonInputString, reddUrl);
+
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				block();
 			}
-			
-			
-			
-			
-			
+
 		}
 
 		private void sendJoinlistToSpringBoot(String messageContent, String redirectURL) throws Exception {
 
-
 			System.out.println("Redirect URL: " + redirectURL);
-
 
 			URI uri = new URI(redirectURL);
 
@@ -117,10 +129,6 @@ public class JadetoSB extends Agent {
 			connection.setRequestMethod("POST");
 			connection.setDoOutput(true);
 			connection.setRequestProperty("Content-Type", "application/json");
-
-
-			
-
 
 			try (OutputStream os = connection.getOutputStream()) {
 				byte[] input = messageContent.getBytes(StandardCharsets.UTF_8);

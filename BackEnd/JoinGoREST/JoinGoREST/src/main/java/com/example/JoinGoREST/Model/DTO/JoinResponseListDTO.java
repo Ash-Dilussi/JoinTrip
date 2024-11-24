@@ -15,5 +15,5 @@ public class JoinResponseListDTO {
 
 	private JoinRequestDTO currentPassenger;
 
-	private List<JoinRequestDTO> joinPassengerList = new ArrayList<>();
+	private List<JoinRequestDTO> joinPassengerList ;
 }

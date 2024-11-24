@@ -67,7 +67,7 @@ const DistantRoute = () => {
           text: tripdistance.text
         }))
     
-       // console.log('Distance in meters:', distance.value);
+       //console.log('Distance in meters:', tripdistance.text);
         
       } else {
         console.log('No route found');
@@ -76,6 +76,7 @@ const DistantRoute = () => {
       const points = decodePolyline(
         response.data.routes[0].overview_polyline.points
       );
+       
       setRoute(points);
       dispatch(
         setFarRoute({
@@ -175,11 +176,9 @@ const DistantRoute = () => {
             <Polyline coordinates={route} strokeWidth={5} strokeColor="blue" />
           )}
         </MapView>
-        
-      </View>
-      <View >
-          <TouchableOpacity
-            style={tw`mt-0 mx-0`}
+        <TouchableOpacity
+            //style={tw`mt-0 mx-0`}
+            style={tw`absolute bottom-5 right-5 p-3`}
             onPress={goToCurrentLocation}
           >
           
@@ -190,6 +189,9 @@ const DistantRoute = () => {
               type="antdesign"
             />
           </TouchableOpacity>
+      </View>
+      <View >
+          
         </View>
 
       <View style={tw`h-1/2`}>

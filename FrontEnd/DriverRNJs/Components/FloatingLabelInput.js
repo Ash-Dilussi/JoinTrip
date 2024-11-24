@@ -1,24 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, TextInput, Animated, Text } from 'react-native';
 import tw from 'twrnc';
 
-const FloatingLabelInput = ({ label }) => {
+const FloatingLabelInput = ({ label, value, onChangeText }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+   
   const animatedIsFocused = useRef(new Animated.Value(0)).current;
 
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => {
-    if (!inputValue) setIsFocused(false);
-  };
+  const handleFocus = () => setIsFocused(true); 
 
   React.useEffect(() => {
     Animated.timing(animatedIsFocused, {
-      toValue: isFocused || inputValue ? 1 : 0,
+      toValue: isFocused || value ? 1 : 0,
       duration: 200,
       useNativeDriver: false,
     }).start();
-  }, [isFocused, inputValue]);
+  }, [isFocused, value]);
 
   const labelStyle = {
     position: 'absolute',
@@ -43,10 +40,10 @@ const FloatingLabelInput = ({ label }) => {
         {label}
       </Animated.Text>
       <TextInput
-        value={inputValue}
-        onChangeText={setInputValue}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        value={value}
+        onChangeText={onChangeText}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(value ? true : false)}
         style={tw`border-b border-gray-400 py-2 text-lg`}
       />
     </View>

@@ -1,8 +1,8 @@
 package DTO;
 
+import jade.util.leap.Serializable;
 
-
-public class ResDriverMatch{
+public class ResDriverMatch implements Serializable{
 	
 	private TaxiStatusDTO taxiStatust;
 	private TaxiRequestDTO taxiRequest;

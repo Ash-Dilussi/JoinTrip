@@ -20,11 +20,11 @@ public class JoinRequestDTO {
 	public String userId; 
 	public String joinReqId;
 	public String desplace_id;
-	public float startLon =0;
-	public float startLat =0;
-	public float destLon =0;
-	public float destLat =0;
-	 
+	public double startLon ;
+	public double startLat ;
+	public double destLon ;
+	public double destLat ;
+	
 	 
 	public int requestStatus =0;
 	public int reqVehicletype=0;
@@ -36,6 +36,10 @@ public class JoinRequestDTO {
 	public int userType;
 	
 	public Passenger userInfo ;
+	
+	public String taxiReqid;
+ 
+	
 	
 	public  Date getScheduleTimeinDate() {
 		System.out.println(scheduleTime);

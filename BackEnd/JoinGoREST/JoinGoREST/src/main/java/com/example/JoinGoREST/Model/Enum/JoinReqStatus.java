@@ -5,7 +5,7 @@ package com.example.JoinGoREST.Model.Enum;
 public enum JoinReqStatus{
 	
 	Expire , 
-	view ,
+	View ,
 	Reqeust,
 	Accept,
 	Decline

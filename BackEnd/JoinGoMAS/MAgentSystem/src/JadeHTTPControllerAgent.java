@@ -12,10 +12,12 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import DTO.TaxiStatusDTO;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
@@ -38,7 +40,7 @@ public class JadeHTTPControllerAgent extends Agent{
 			public void action() {
 				ACLMessage msg = receive();
 				if (msg != null) {
-					System.out.println("Message received SB: " + msg.getContent());
+					System.out.println("Message received from SB to http ");
 				} else {
 					block();
 				}
@@ -51,7 +53,7 @@ public class JadeHTTPControllerAgent extends Agent{
 			HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
 			//  multiple contexts
-			server.createContext("/taxiRequest", new taxiRequestHandler());
+			//server.createContext("/taxiRequest", new taxiRequestHandler());
 			server.createContext("/taxiStatusUpdate", new taxiStatusUpdateHandler());
 		
 
@@ -77,7 +79,9 @@ public class JadeHTTPControllerAgent extends Agent{
 					Gson gson = new Gson();
 					TaxiStatusDTO driver = gson.fromJson(data,TaxiStatusDTO.class);
 					Object[] args = new Object[] { driver };
-
+					System.out.println("driver name: " + driver.getCurrentLat()+ driver.getDriverid());
+					
+					
 					if(isExistinMAS(driver.getDriverid()).length > 0) {
 						DFAgentDescription[] existdriver = isExistinMAS(driver.getDriverid());
 
@@ -111,15 +115,19 @@ public class JadeHTTPControllerAgent extends Agent{
 			DFAgentDescription[] results= null;
 			try {
 				DFAgentDescription template = new DFAgentDescription();
-				ServiceDescription sd = new ServiceDescription();
-				sd.setName(driverName);
-				template.addServices(sd);
-
+				//ServiceDescription sd = new ServiceDescription();
+				//sd.setName(driverName);
+				//template.addServices(sd);
+			 
+				//results = DFService.search(JadeHTTPControllerAgent.this, template);
+			     
+				AID agentAID = new AID(driverName, AID.ISLOCALNAME); 
+				template.setName(agentAID);
 				results = DFService.search(JadeHTTPControllerAgent.this, template);
 
 			}catch(Exception ex) {ex.printStackTrace();}
 			//return results.length >0 ;
-			return results;
+			return results != null ? results : new DFAgentDescription[0];
 		}
 	}
 

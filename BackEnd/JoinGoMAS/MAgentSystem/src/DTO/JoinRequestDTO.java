@@ -29,7 +29,7 @@ public class JoinRequestDTO implements Serializable {
 	private int userType;
 	private int reqVehicletype;
 	
- 
+	private String taxiReqid;
 
 	public String getJoinReqId() {
 		return joinReqId;
@@ -149,6 +149,14 @@ public class JoinRequestDTO implements Serializable {
 
 	public void setRequestStatus(int requestStatus) {
 		this.requestStatus = requestStatus;
+	}
+
+	public String getTaxiReqid() {
+		return taxiReqid;
+	}
+
+	public void setTaxiReqid(String taxiReqid) {
+		this.taxiReqid = taxiReqid;
 	}
 
 

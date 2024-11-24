@@ -19,7 +19,9 @@ public interface PassengerRepo extends JpaRepository<Passenger , Integer>{
 	
 	
 	@Query (value="SELECT t1.* FROM tbl_passenger t1 INNER JOIN tbl_join_request t2 ON t1.userid = t2.userid WHERE t2.joinreqid = :joinreqId ", nativeQuery= true)
-	Passenger getResponsePassforreqId(String joinreqId);
+	Passenger getPassforreqId(String joinreqId);
+	
+
 	
 	
 	

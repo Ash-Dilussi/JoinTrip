@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.JoinGoREST.Model.DTO.ResDriverMatchDTO;
 import com.example.JoinGoREST.Model.Entity.TaxiDriverStatus;
 import com.example.JoinGoREST.service.Idriver;
 
@@ -21,10 +22,11 @@ public class DriverController {
 	@Autowired
 	private Idriver _driver;
 
-	@GetMapping("/masReponseJoin")
+	@PostMapping("/masReponseTaxiMatch")
 	public String respondfromMASaboutReqMatches(@RequestBody String StringfromMAS) {
 		try {
 
+		System.out.println("hit to driver from MAS"+StringfromMAS);
 			_driver.tripMatchCallsSendtoDriver(StringfromMAS);
 			return "all gud";
 

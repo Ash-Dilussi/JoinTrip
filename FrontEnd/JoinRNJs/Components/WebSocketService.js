@@ -1,40 +1,131 @@
+import { TextDecoder, TextEncoder } from "text-encoding";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { WEBSOCKET_URL } from "@env";
-import { useDispatch, useSelector } from "react-redux";
-import {} from "../slices/navSlice";
- 
+import {
+  addJoinList,
+  addTaxiLocation,
+  removeFromJoinList,
+  replaceJoinListItem,
+  setNewJoinRequest,
+  setCurrentJoinReqId
+} from "../slices/navSlice";
+
+// Polyfill for TextDecoder and TextEncoder in React Native
+if (typeof global.TextDecoder === "undefined") {
+  global.TextDecoder = TextDecoder;
+}
+
+if (typeof global.TextEncoder === "undefined") {
+  global.TextEncoder = TextEncoder;
+}
 
 class WebSocketService {
   constructor() {
     this.stompClient = null;
     this.privateStompClient = null;
-    
   }
 
   // Connect to the WebSocket and set up subscriptions
-  connect(userInfo) {
+  connect(userInfo, dispatch) {
     const socket = new SockJS(WEBSOCKET_URL);
     try {
       this.stompClient = new Client({
         webSocketFactory: () => socket,
-        debug: (str) => console.log("11",str, socket),
+        debug: (str) => console.log("11", str, socket.url),
         onConnect: () => {
-          console.log("Connected to WebSocket:",userInfo.primaryUserInfo.userid);
-         
-
           this.stompClient.subscribe(
-            `/topic/passenger/requests/${userInfo.primaryUserInfo.userid}`,
+            `/specific/passenger/requests/${userInfo.primaryUserInfo.userid}`,
             (message) => {
-              // const parsedMessage = JSON.parse(message.body);
-              console.log("parsedMessage:" ,message.body);
+              if (message && message.body) {
+                const JoinreqList = JSON.parse(message.body);
+                const reqStatus = JoinreqList.reqStatus;
+                console.log("reqStatus :", reqStatus);
+                switch (reqStatus) {
+                  case "Expire":
+                    dispatch(
+                      removeFromJoinList({
+                        senderJoinReqId: JoinreqList.senderJoinReqId,
+                      })
+                    );
+                    break;
+
+                  case "View":
+                    dispatch(addJoinList(JoinreqList));
+                    break;
+
+                  case "Reqeust":
+                    dispatch(
+                      replaceJoinListItem({
+                        senderJoinReqId: JoinreqList.senderJoinReqId,
+                        newValues: {
+                          reqStatus: JoinreqList.reqStatus,
+                        },
+                      })
+                    );
+                    dispatch(setNewJoinRequest(JoinreqList));
+ 
+                    break;
+
+                  case "Accept":
+                    dispatch(setNewJoinRequest(JoinreqList));
+
+                    break;
+                  case "Decline":
+                    break;
+
+                  default:
+                    break;
+                }
+
+                console.log("Parsed :", JoinreqList);
+              }
             }
+          );
+          this.stompClient.subscribe(
+            `/specific/passenger/driverInfo/${userInfo.primaryUserInfo.userid}`,
+
+            // const parsedMessage = JSON.parse(message.body);
+            (message) => {
+              if (message && message.body) {
+                const parsedMessage = JSON.parse(message.body);
+
+                console.log("Parsed :", parsedMessage.currentLat);
+                dispatch(
+                  addTaxiLocation({
+                    lat: parsedMessage.currentLat,
+                    lng: parsedMessage.currentLon,
+                  })
+                );
+              }
+            }
+          );
+          this.stompClient.subscribe(
+            `/specific/passenger/joinList/${userInfo.primaryUserInfo.userid}`,
+            (message) => {
+
+              if (message && message.body) {
+
+                const listItem = JSON.parse(message.body);
+                 
+                dispatch(addJoinList(listItem))
+
+              }
+
+            }
+          );
+        },
+        onStompError: (error) => {
+          console.error(
+            "STOMP error:",
+            error.headers.message || error.body || error
           );
         },
         onDisconnect: () => {
           console.log("Disconnected from WebSocket");
-        },
-        reconnectDelay: 100, // Reconnect if disconnected: delay
+        }, // Connection error handler
+
+        reconnectDelay: 500, // Reconnect if disconnected: delay
       });
 
       this.stompClient.activate();

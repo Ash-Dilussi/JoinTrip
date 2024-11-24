@@ -32,10 +32,10 @@ public class JoinRequest {
 	private String userid; 
 	private String joinreqid;
 	private String desplace_id;
-	private float startLon =0;
-	private float startLat =0;
-	private float destLon =0;
-	private float destLat =0; 
+	private double startLon =0;
+	private double startLat =0;
+	private double destLon =0;
+	private double destLat =0; 
 	
 	private int requestStatus;
 	private int reqVehicletype=0;

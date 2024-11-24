@@ -1,14 +1,15 @@
 package DTO;
 
+import jade.util.leap.Serializable;
 
-public class TaxiStatusDTO{
+public class TaxiStatusDTO implements Serializable{
 
-	private String Driverid;
-	private String Drivername;
-	private float currentLon=0;
-	private float currentLat=0;
-	private float headingLat=0;
-	private float headingLon=0;
+	private String driverid;
+	private String drivername;
+	private double currentLon=0;
+	private double currentLat=0;
+	private double headingLat=0;
+	private double headingLon=0;
 	private int vehicletype;
 	private int taxiStatus;
 	private int onService =1;
@@ -19,39 +20,39 @@ public class TaxiStatusDTO{
 	
 	
 	public String getDriverid() {
-		return Driverid;
+		return driverid;
 	}
 	public void setDriverid(String driverid) {
-		Driverid = driverid;
+		driverid = driverid;
 	}
-	public float getHeadingLat() {
+	public double getHeadingLat() {
 		return headingLat;
 	}
-	public void setHeadingLat(float headingLat) {
+	public void setHeadingLat(double headingLat) {
 		this.headingLat = headingLat;
 	}
 	public String getDrivername() {
-		return Drivername;
+		return drivername;
 	}
 	public void setDrivername(String drivername) {
-		Drivername = drivername;
+		drivername = drivername;
 	}
-	public float getCurrentLon() {
+	public double getCurrentLon() {
 		return currentLon;
 	}
-	public void setCurrentLon(float currentLon) {
+	public void setCurrentLon(double currentLon) {
 		this.currentLon = currentLon;
 	}
-	public float getCurrentLat() {
+	public double getCurrentLat() {
 		return currentLat;
 	}
-	public void setCurrentLat(float currentLat) {
+	public void setCurrentLat(double currentLat) {
 		this.currentLat = currentLat;
 	}
-	public float getHeadingLon() {
+	public double getHeadingLon() {
 		return headingLon;
 	}
-	public void setHeadingLon(float headingLon) {
+	public void setHeadingLon(double headingLon) {
 		this.headingLon = headingLon;
 	}
 	public int getVehicletype() {

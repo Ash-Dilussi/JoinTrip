@@ -10,9 +10,11 @@ const initialState= {
     userType: 0,
     userInfo: null,
     joinList: [],
+    taxiLocation: [],
     segmentDistanceKm:10,
     tripDistanceKm:0,
     currentJoinReqId: null,
+    newJoinRequest: null,
 }
 
 export const navSlice = createSlice({
@@ -46,6 +48,20 @@ export const navSlice = createSlice({
         addJoinList: (state, action) => {
             state.joinList.push(action.payload); 
         },
+        removeFromJoinList: (state, action) => {
+            state.joinList = state.joinList.filter(item => item.senderJoinReqId !== action.payload.senderJoinReqId);
+        },
+        replaceJoinListItem: (state, action) => {
+            state.joinList = state.joinList.map(item => 
+                item.senderJoinReqId === action.payload.senderJoinReqId ? { ...item, ...action.payload.newValues } : item
+            );
+        },
+        addTaxiLocation: (state, action) => {
+            state.taxiLocation.push(action.payload); 
+        },
+        clearTaxiLocation: (state) => {
+            state.taxiLocation = []; 
+        },
         clearJoinList: (state) => {
             state.joinList = []; 
         },
@@ -58,10 +74,13 @@ export const navSlice = createSlice({
         setCurrentJoinReqId:(state,action)=>{
             state.currentJoinReqId = action.payload;
         },
+        setNewJoinRequest:(state,action)=>{
+            state.newJoinRequest = action.payload;
+        },
     },
 });
 
-export const {setOrigin, setDestination, setTravelTimeInformation, setFarRoute, setRideType, setScheduleTime, setUserType, setUserInfo, addJoinList, clearJoinList,setSegmentDistanceKm,setTripDistanceKm,setCurrentJoinReqId}= navSlice.actions;
+export const {setOrigin, setDestination, setTravelTimeInformation, setFarRoute, setRideType, setScheduleTime, setUserType, setUserInfo, addJoinList, clearJoinList,setSegmentDistanceKm,setTripDistanceKm,setCurrentJoinReqId,addTaxiLocation,clearTaxiLocation,removeFromJoinList,replaceJoinListItem,setNewJoinRequest}= navSlice.actions;
 
 //selectors: import data from the global states
 export const selectOrigin = (state) => state.nav.origin;
@@ -73,9 +92,13 @@ export const selectScheduleTime = (state) => state.nav.scheduleTime;
 export const selectUserType = (state) => state.nav.userType;
 export const selectUserInfo = (state) => state.nav.userInfo;
 export const selectJoinList = (state) => state.nav.joinList;
+export const selectTaxiLocation = (state) => state.nav.taxiLocation;
 export const selectSegmentDistanceKm = (state) => state.nav.segmentDistanceKm;
 export const selectTripDistanceKm = (state) => state.nav.tripDistanceKm;
 export const selectCurrentJoinReqId = (state) => state.nav.currentJoinReqId;
-
+export const selectNewJoinRequest = (state) => state.nav.newJoinRequest;
+export const selectJoinListItemById = (state, reqID) => {
+    return state.nav.joinList.find(item => item.reqID === reqID);
+  };
 
 export default navSlice.reducer;
